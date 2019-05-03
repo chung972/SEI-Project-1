@@ -1,0 +1,54 @@
+*, *::after, *::before {
+    box-sizing: border-box;
+  }
+
+body {
+    height: 100vh;      
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-rows: 1fr 3fr 1fr;
+    grid-template-areas:
+    "colL title colR"
+    "colL game colR"
+    "colL bot colR";
+}
+
+section {
+    display: grid;
+    grid-template-columns: repeat(8, 8vmin);
+    grid-template-rows: repeat(8, 8vmin);
+    grid-gap: 1vmin;
+    background-color: #065241;
+  }
+
+  section div {
+    border-radius: 50%;
+    border: 5px solid grey;
+    
+}
+section div:hover{
+    border-style: dashed;
+}
+
+.flexbox-ctr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header {
+    grid-area: title;
+    font-size: 10vmin;
+    margin: 3vmin;
+}
+footer {
+    grid-area: bot;
+}
+
+#board{
+    grid-area: game;
+    display:flexbox;
+    justify-content: center;
+    
+}
