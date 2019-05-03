@@ -248,4 +248,5 @@ function handleClick(evt) {
     checkDown(colIdx,rowIdx);
     render();
     // calls render() to have the front-end reflect the newly updated app state
+    
 }
