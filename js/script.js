@@ -6,7 +6,7 @@ const PLAYERS = {
 };
 
 /*----- app's state (variables) -----*/
-var board, winner, turn;   
+var board, tempBoard, winner, turn;
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
 
@@ -54,6 +54,84 @@ var board, winner, turn;
      them. 
         const colIdx = parseInt(tile.id.charAt(1));
         const rowIdx = parseInt(tile.id.charAt(3));
+    we JUST learned about an iterator that might help us here (would also help with the current js challenge);
+    something that ONLY adds properties (and updates existing ones)
+
+    maybe it's too ambitious to have a check function search BOTH directions. might need checkLeft, checkRight, checkUp,
+    checkDown, etc. 
+
+    so getting back to it, as soon as you enter a div, you immediately call on all the check functions. as you're checking
+    you are storing the positions of enemy tiles in c#r# convention (so you can unpack later; remember to store as STRINg).
+    once you actually CLICK, call a separate function to CONVERT enemy tiles into your own (in the board var); we already
+    call render() in handleClick, so don't worry about that. 
+
+    looking more and more like we're going to need a global array variable to store (.push) the coordinates of potentially
+    convertible enemy chips. actually, maybe we could recreate an entire board and call it tempBoard. have the same values
+    as the initial board, but whenever you call check, maybe convert along the way, and keep track of a potentially ready-to-go
+    converted board that all you would need to do is render(). 
+
+    so as you're CHECKING, conver the tempBoard as you're iterating through, changing their content (turn) based on their
+    current turn value. maybe something like if(board[colIdx][rowidx] === turn*-1) [colIdx][rowIdx] = turn*-1
+    in words, that jsut means, if the current nested index is OPPOSITE your color, make that tile YOUR COLOR
+
+    need to be able to handle while iterating
+    IF it's yoru tile, return   also check here if there are enemy tiles between mouseEnter div and this other yourTile
+        if yes, return the tempBoard that holds those potential converted enemy tiles
+        if NO, then return regular var board
+    IF it's enemy tile, convert on tempBoard
+    IF it's empty, return legal
+
+
+    maybe have a scores OBJECT with the same keys as PLAYERS
+    that way when you iterate through, if you DO happen to
+
+
+    LATEST COMMENTS [1526]
+
+    recursion STOPS once you return a value
+    when you call on check, it is built in with inc/decrement
+    e.g.  - 
+    checkDown(colIdx, rowIdx) {
+        do something
+        checkDown(colIdx, --rowIdx)
+            for checkDOWN, we DECREMENT rowIdx here because of how the board is generated (since it builds from index of 0 to max)
+            and colIdx stays the same, obviously
+    }
+
+    if board[colIdx][--rowIdx] === YOUR TURN, checkLegal()
+    if board[colIdx][--rowIdx] === ENEMY TURN, turn *= -1, check(--colIdx, rowIdx)  <--(we'll still use checkDown for this example)
+    if board[colIdx][--rowIdx] === 0 OR out of bounds, just return; you've already handled the other cases
+        maybe just do } else { return } (since outside of the case that the tile is yours or the enemy, you're just going to return)
+
+    create a convert() function that will swap the values of board and tempBoard
+
+    going to need a checkLegal() function. should accept CURRENT colIdx and rowIdx
+
+    again, using the checkDown() example, we would have something like this:
+        checkDown(colIdx, rowIdx) {
+            // check down will always look BELOW its current position; it WILL NOT EVALUATE the current position
+            if(board[colIdx][--rowIdx] === PLAYERS[turn]){    means if it is your chip
+                if(checkLegal(colIdx, rowIdx)){
+                    return tempBoard;
+                } else{
+                    return board;
+                }
+            } else if (board[colIdx][--rowIdx] === PLAYERS[turn*-1]){     means if it is an ENEMY chip
+                tempBoard[colIdx][--rowIdx] *= -1;
+                checkDown(colIdx, --rowIdx);
+            } else{
+                return;
+            }
+        }
+             
+        function checkLegal(colIdx, rowIdx){
+            return (board[++colIdx][rowIdx] !== board[colIdx][rowIdx]);
+                this just means that if the turn (aka PLAYER) ABOVE the current tile is DIFFERENT (!==), then return true
+                if they are the SAME return false - meaning you're trying to place a chip right next to your own 
+        }
+
+    
+        i think you're going to have to end up doing check every cardinal direction as have isLegal() methods for each direction as well
  *  */
 
 
@@ -86,6 +164,7 @@ function init() {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
     ];
+    tempBoard = board;
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     render();   // call render to have the front-end reflect app state
@@ -98,6 +177,13 @@ function render() {
             const div = document.getElementById(`c${colIdx}r${rowIdx}`);
             // use template literal notation to procedurely set the background
             // color of each div element that represents a tile/chip
+
+            /** FOR CSS STYLING PURPOSES
+             *      consider wrapping each div with another div, that way we can create an actual grid
+             *      have the outer/wrapper div display a border; and we won't have to worry about trying
+             *      to access the tile pieces because we have ids (that's how powerful they are)
+             */
+
             div.style.backgroundColor = PLAYERS[content];
             // use square bracket notation because input can vary; 
             // note that the VALUE of PLAYERS[content] will depend on

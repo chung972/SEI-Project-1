@@ -2,6 +2,9 @@
     box-sizing: border-box;
   }
 
+/* for styling, you might want to consider HARD CODING in some px or maybe vmin numbers for the board
+and tile pieces; obviously keep their width and heigh the same to maintain a square shape
+also, don't forget that you can take advantage of setting width = 100% */
 body {
     height: 100vh;      
     margin: 0;
