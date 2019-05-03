@@ -10,8 +10,9 @@ var board, tempBoard, winner, turn;
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
 
-// TODO need variables that will hold/count each player's chips
-//      maybe just use a nested forEach combined with .includes(turn)?
+// no need to have actual vars holding each player's chip count because we can compute it
+
+
 /**
  *   TODO need a boolean var to track whether a move is legal? would need
      an accompanying function; would we need to keep it global if it 
@@ -137,6 +138,7 @@ var board, tempBoard, winner, turn;
 
 
 /*----- cached element references -----*/
+// this'll be where we want to reference a html element to reflect a player's score/current number of chips
 
 /*----- event listeners -----*/
 document.getElementById("board").addEventListener('click', handleClick);
@@ -152,6 +154,33 @@ document.querySelector("button").addEventListener('click', init);
 
 /*----- functions -----*/
 init(); // call the init function so the game starts upon loading
+
+
+function checkDown(colIdx, rowIdx) {
+    console.log(`You are currently clicked/hovered tile AT c[${colIdx}]r[${rowIdx}]`)
+    console.log(`the value of turn of your CURRENT tile is: ${board[colIdx[rowIdx]]}`)
+    console.log(`the value of of turn of the tile tile BELOW is: ${board[colIdx[--rowIdx]]}`)
+    if(board[colIdx][--rowIdx] === PLAYERS[turn]){
+        console.log(`you are LOOKING at ${board[colIdx][--rowIdx]}`);   
+        if(checkLegal(colIdx, rowIdx)){
+            console.log(`checkLegal returned ${checkLegal(colIdx, rowIdx)}`)
+            return tempBoard;
+        } else{
+            console.log(`checkLegal returned ${checkLegal(colIdx, rowIdx)}`)
+            return board;
+        }
+    } else if (board[colIdx][--rowIdx] === PLAYERS[turn*-1]){ 
+        tempBoard[colIdx][--rowIdx] *= -1;
+        checkDown(colIdx, --rowIdx);
+    } else{
+        return;
+    }
+}
+
+function checkLegal(colIdx, rowIdx){
+    return (board[++colIdx][rowIdx] !== board[colIdx][rowIdx]);
+}
+
 
 function init() {
     board = [
@@ -215,6 +244,8 @@ function handleClick(evt) {
     // set the nested index to be whichever player's turn it is 
     turn *= -1;
     // hands the turn back over to the other player; look at init() for initial turn value
+
+    checkDown(colIdx,rowIdx);
     render();
     // calls render() to have the front-end reflect the newly updated app state
 }
