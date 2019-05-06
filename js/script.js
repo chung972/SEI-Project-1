@@ -228,7 +228,20 @@ function checkUp(colIdx, rowIdx) {
 }
 
 function checkUpLegal(colIdx, rowIdx) {
-    return (board[colIdx][rowIdx] !== board[colIdx][++rowIdx] && (board[colIdx][rowIdx]!==0) && (rowIdx < board[colIdx].length));
+    let bool1 = rowIdx < board[colIdx].length;
+    console.log(`rowIdx < board[${colIdx}].length: ${bool1}`);
+    // let bool2 = board[colIdx][rowIdx] !== board[colIdx][++rowIdx];
+    let bool2 = turn !== board[colIdx][++rowIdx];
+    rowIdx--; //compensating for console.log above;
+    // console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
+    console.log(`turn (${turn}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
+    rowIdx--; //compensating for console.log above;
+
+
+    let bool3 = board[colIdx][++rowIdx]!==0;
+    // don't have to worry about dec'ing this ++rowIdx because this is the last boolean that uses it for logic
+    console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0 ${bool3}`);
+    return bool1 && bool2 && bool3;
     // so long as the value of turn for the tile ABOVE you is NOT the same AND is NOT 0, AND is within the bounds
 }
 
@@ -293,24 +306,25 @@ function handleClick(evt) {
     // handles cases where there is an existing value in a tile or if winner is found
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
    
-    console.log(`checkDownLegal(colIdx,rowIdx): ${checkDownLegal(colIdx,rowIdx)}
-    \ncheckUpLegal(colIdx,rowIdx): ${checkUpLegal(colIdx,rowIdx)}`);
+    // console.log(`checkDownLegal(colIdx,rowIdx): ${checkDownLegal(colIdx,rowIdx)}
+    // \ncheckUpLegal(colIdx,rowIdx): ${checkUpLegal(colIdx,rowIdx)}`);
+    console.log(`clicked on board[${colIdx}][${rowIdx}]`);
 
     if(checkDownLegal(colIdx,rowIdx)||checkUpLegal(colIdx,rowIdx)){
         board[colIdx][rowIdx] = turn;
+        console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
+        // set the nested index to be whichever player's turn it is 
+        checkDown(colIdx, rowIdx);
+        checkUp(colIdx, rowIdx);
         turn *= -1; // necessarily need this here, because so long as the player hasn't clicked, it is STILL that player's turn
+        // hands the turn back over to the other player; look at init() for initial turn value
     } 
     // this if statement above will need to include the checkLegals for all directions; also, we want to use
     // the OR gates because so long as ONE of checks are legal, we can let the user click there
     // TODO worry about changing the border to dashed and hover/mouseEnter logic
-    console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
-    // set the nested index to be whichever player's turn it is 
-    if (checkDownLegal(colIdx, rowIdx)) checkDown(colIdx, rowIdx);
-    if (checkUpLegal(colIdx, rowIdx)) checkUp(colIdx, rowIdx);
 
 
 
-    // hands the turn back over to the other player; look at init() for initial turn value
 
     render();
     // calls render() to have the front-end reflect the newly updated app state
