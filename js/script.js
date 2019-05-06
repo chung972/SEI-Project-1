@@ -163,30 +163,33 @@ function checkDown(colIdx, rowIdx) {
     rowIdx++; // compensating for console.log above; 
     // just as a rule of thumb, make sure to compensate after inc/decrementing in a template literal
     console.log(`value of rowIdx w/compensation: ${rowIdx}`);
-    
+
     if (board[colIdx][--rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         if (checkDownLegal(colIdx, rowIdx)) {   // because we decremented in the if statement above, don't need to dec again
-            console.log(`obvi checkDownLegal returned true`);
+            console.log(`checkDownLegal returned ${checkDownLegal(colIdx, rowIdx)}`);
             return tempBoard;
         } else {
-            console.log("obvi checkDownLegal returned false");
+            console.log(`checkDownLegal returned ${checkDownLegal(colIdx, rowIdx)}`);
             return board;
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+    } else if (board[colIdx][rowIdx] === (turn * -1)) {
         // since that first IF didn't return true, we skip that block, then we go to the next, HOWEVER, since we DID run
         // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
         // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
         // to anything (which would require an '=')
         console.log(`in else if; board[${colIdx}][${rowIdx}] === ${turn} is ${board[colIdx][rowIdx] === turn}`);
-        tempBoard[colIdx][rowIdx] = turn*-1;
-        console.log(`board: ${board}; tempBoard ${tempBoard}`);
+        tempBoard[colIdx][rowIdx] = turn;
+        // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
+        // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
+        // set the tempBoard at this nested index to hold the converted tile value 
+        // console.log(`board: ${board}; tempBoard ${tempBoard}`);
         checkDown(colIdx, rowIdx);
     } else {
         console.log("do nothing");
         return;
     }
-    
+
 }
 
 function checkDownLegal(colIdx, rowIdx) {
@@ -194,7 +197,39 @@ function checkDownLegal(colIdx, rowIdx) {
     // console.log(`checking - board[${colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
     // rowIdx--; // compensating for console.log above; 
     // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
-    return (board[colIdx][rowIdx] !== board[colIdx][++rowIdx]);
+    return (board[colIdx][rowIdx] !== board[colIdx][--rowIdx] && (board[colIdx][rowIdx]!==0) && (rowIdx < board[colIdx].length));
+}
+
+function checkUp(colIdx, rowIdx) {
+    console.log(`CURRENT tile is: board[${colIdx}][${rowIdx}]`);
+    console.log(`the value of the tile ABOVE (c[${colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    rowIdx--; // compensating for console.log above; 
+    console.log(`value of rowIdx w/compensation: ${rowIdx}`);
+
+    if (board[colIdx][++rowIdx] === turn) {
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        if (checkUpLegal(colIdx, rowIdx)) {
+            console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
+            return tempBoard;
+        } else {
+            console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
+            return board;
+        }
+    } else if (board[colIdx][rowIdx] === (turn * -1)) {
+        console.log(`in else if; board[${colIdx}][${rowIdx}] === ${turn} is ${board[colIdx][rowIdx] === turn}`);
+        tempBoard[colIdx][rowIdx] = turn;
+        // console.log(`board: ${board}; tempBoard ${tempBoard}`);
+        checkUp(colIdx, rowIdx);
+    } else {
+        console.log("do nothing");
+        return;
+    }
+
+}
+
+function checkUpLegal(colIdx, rowIdx) {
+    return (board[colIdx][rowIdx] !== board[colIdx][++rowIdx] && (board[colIdx][rowIdx]!==0) && (rowIdx < board[colIdx].length));
+    // so long as the value of turn for the tile ABOVE you is NOT the same AND is NOT 0, AND is within the bounds
 }
 
 
@@ -257,12 +292,24 @@ function handleClick(evt) {
     if ((board[colIdx][rowIdx]) || winner) return;
     // handles cases where there is an existing value in a tile or if winner is found
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
-    board[colIdx][rowIdx] = turn;
-    console.log(`board[${colIdx}][${rowIdx}]'s turn value is: ${turn}`)
+   
+    console.log(`checkDownLegal(colIdx,rowIdx): ${checkDownLegal(colIdx,rowIdx)}
+    \ncheckUpLegal(colIdx,rowIdx): ${checkUpLegal(colIdx,rowIdx)}`);
+
+    if(checkDownLegal(colIdx,rowIdx)||checkUpLegal(colIdx,rowIdx)){
+        board[colIdx][rowIdx] = turn;
+        turn *= -1; // necessarily need this here, because so long as the player hasn't clicked, it is STILL that player's turn
+    } 
+    // this if statement above will need to include the checkLegals for all directions; also, we want to use
+    // the OR gates because so long as ONE of checks are legal, we can let the user click there
+    // TODO worry about changing the border to dashed and hover/mouseEnter logic
+    console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
     // set the nested index to be whichever player's turn it is 
-    checkDown(colIdx, rowIdx);
-    turn *= -1;
-    // console.log(`turn is now: ${turn}`);
+    if (checkDownLegal(colIdx, rowIdx)) checkDown(colIdx, rowIdx);
+    if (checkUpLegal(colIdx, rowIdx)) checkUp(colIdx, rowIdx);
+
+
+
     // hands the turn back over to the other player; look at init() for initial turn value
 
     render();
