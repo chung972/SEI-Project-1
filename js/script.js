@@ -157,28 +157,44 @@ init(); // call the init function so the game starts upon loading
 
 
 function checkDown(colIdx, rowIdx) {
-    console.log(`You are currently clicked/hovered tile AT c[${colIdx}]r[${rowIdx}]`)
-    console.log(`the value of turn of your CURRENT tile is: ${board[colIdx[rowIdx]]}`)
-    console.log(`the value of of turn of the tile tile BELOW is: ${board[colIdx[--rowIdx]]}`)
-    if(board[colIdx][--rowIdx] === PLAYERS[turn]){
-        console.log(`you are LOOKING at ${board[colIdx][--rowIdx]}`);   
-        if(checkLegal(colIdx, rowIdx)){
-            console.log(`checkLegal returned ${checkLegal(colIdx, rowIdx)}`)
+    console.log(`CURRENT tile is: board[${colIdx}][${rowIdx}]`);
+    console.log(`the value of the tile BELOW (c[${colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    //note how after we PREfix (--rowIdx), we can just call board[cIdx][rIdx] and we get the correct value of turn
+    rowIdx++; // compensating for console.log above; 
+    // just as a rule of thumb, make sure to compensate after inc/decrementing in a template literal
+    console.log(`value of rowIdx w/compensation: ${rowIdx}`);
+    
+    if (board[colIdx][--rowIdx] === turn) {
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        if (checkDownLegal(colIdx, rowIdx)) {   // because we decremented in the if statement above, don't need to dec again
+            console.log(`obvi checkDownLegal returned true`);
             return tempBoard;
-        } else{
-            console.log(`checkLegal returned ${checkLegal(colIdx, rowIdx)}`)
+        } else {
+            console.log("obvi checkDownLegal returned false");
             return board;
         }
-    } else if (board[colIdx][--rowIdx] === PLAYERS[turn*-1]){ 
-        tempBoard[colIdx][--rowIdx] *= -1;
-        checkDown(colIdx, --rowIdx);
-    } else{
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        // since that first IF didn't return true, we skip that block, then we go to the next, HOWEVER, since we DID run
+        // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
+        // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
+        // to anything (which would require an '=')
+        console.log(`in else if; board[${colIdx}][${rowIdx}] === ${turn} is ${board[colIdx][rowIdx] === turn}`);
+        tempBoard[colIdx][rowIdx] = turn*-1;
+        console.log(`board: ${board}; tempBoard ${tempBoard}`);
+        checkDown(colIdx, rowIdx);
+    } else {
+        console.log("do nothing");
         return;
     }
+    
 }
 
-function checkLegal(colIdx, rowIdx){
-    return (board[++colIdx][rowIdx] !== board[colIdx][rowIdx]);
+function checkDownLegal(colIdx, rowIdx) {
+    // console.log(`passed in pos - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
+    // console.log(`checking - board[${colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
+    // rowIdx--; // compensating for console.log above; 
+    // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
+    return (board[colIdx][rowIdx] !== board[colIdx][++rowIdx]);
 }
 
 
@@ -187,8 +203,8 @@ function init() {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, -1, 1, 0, 0, 0],      // the 4 indices in the center are
-        [0, 0, 0, 1, -1, 0, 0, 0],      // the starting positions every game
+        [0, 0, 0, 1, -1, 0, 0, 0],      // the 4 indices in the center are
+        [0, 0, 0, -1, 1, 0, 0, 0],      // the starting positions every game
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
@@ -214,6 +230,7 @@ function render() {
              */
 
             div.style.backgroundColor = PLAYERS[content];
+
             // use square bracket notation because input can vary; 
             // note that the VALUE of PLAYERS[content] will depend on
             // the KEY that is passed in (the actual 'content' arg); 
@@ -227,7 +244,7 @@ function render() {
 }
 
 function handleClick(evt) {
-    const tile = evt.target;    
+    const tile = evt.target;
     // create a function scoped constant on the element that fired the event
     const colIdx = parseInt(tile.id.charAt(1));
     const rowIdx = parseInt(tile.id.charAt(3));
@@ -235,18 +252,20 @@ function handleClick(evt) {
     // representing a space on the board (c'col#'r'row#'), we can specifically
     // target them with hardcoded indices; note that this is NOT ROBUST
     // console.log(`colIdx: ${colIdx} rowIdx: ${rowIdx}`);
-    if (isNaN(colIdx)) return;  
+    if (isNaN(colIdx)) return;
     // handles cases where users click inbetween divs
-    if((board[colIdx][rowIdx])||winner) return; 
+    if ((board[colIdx][rowIdx]) || winner) return;
     // handles cases where there is an existing value in a tile or if winner is found
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
     board[colIdx][rowIdx] = turn;
+    console.log(`board[${colIdx}][${rowIdx}]'s turn value is: ${turn}`)
     // set the nested index to be whichever player's turn it is 
+    checkDown(colIdx, rowIdx);
     turn *= -1;
+    // console.log(`turn is now: ${turn}`);
     // hands the turn back over to the other player; look at init() for initial turn value
 
-    checkDown(colIdx,rowIdx);
     render();
     // calls render() to have the front-end reflect the newly updated app state
-    
+
 }
