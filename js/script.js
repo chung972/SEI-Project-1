@@ -157,7 +157,7 @@ init(); // call the init function so the game starts upon loading
 
 
 function checkDown(colIdx, rowIdx) {
-    console.log(`CURRENT tile is: board[${colIdx}][${rowIdx}]`);
+    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}; tempBoard value is: ${tempBoard[colIdx][rowIdx]}`);
     console.log(`the value of the tile BELOW (c[${colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
     //note how after we PREfix (--rowIdx), we can just call board[cIdx][rIdx] and we get the correct value of turn
     rowIdx++; // compensating for console.log above; 
@@ -178,7 +178,7 @@ function checkDown(colIdx, rowIdx) {
         // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
         // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
         // to anything (which would require an '=')
-        console.log(`in else if; board[${colIdx}][${rowIdx}] === ${turn} is ${board[colIdx][rowIdx] === turn}`);
+        console.log(`in else if; board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === turn (${turn}) is ${board[colIdx][rowIdx] === turn}`);
         tempBoard[colIdx][rowIdx] = turn;
         // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
         // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
@@ -193,31 +193,48 @@ function checkDown(colIdx, rowIdx) {
 }
 
 function checkDownLegal(colIdx, rowIdx) {
-    // console.log(`passed in pos - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx--; // compensating for console.log above; 
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
-    return (board[colIdx][rowIdx] !== board[colIdx][--rowIdx] && (board[colIdx][rowIdx]!==0) && (rowIdx < board[colIdx].length));
+    console.log("In checkDownLegal()");
+    console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
+    console.log(`checking - board[${colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
+    rowIdx++; // compensating for console.log above; 
+
+    let bool1 = --rowIdx > -1;  // catches cases where the rowIdx you are checking is out of bounds (i.e. undefined)
+    // also, because there are only 8 (0-7)rows, we won't have to worry about a player clicking on row 9 (index 8)
+    // NOTE: the cases where clicking on row 0 is legal will be caught by the checkUpLegal function
+    console.log(`bool1: --rowIdx (${rowIdx}) > -1: ${bool1}`);
+    rowIdx++;
+    
+    let bool2 = turn !== board[colIdx][--rowIdx]; 
+    // checks that the chip BELOW you belongs to the opponent; i.e. in order to be true, the value of that tile should 
+    // have a DIFFERENT turn value
+    rowIdx++; //compensating for console.log above;
+    console.log(`bool2: turn (${turn}) !== board[${colIdx}][${--rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
+    rowIdx++; //compensating for console.log above;
+
+    let bool3 = board[colIdx][--rowIdx] !== 0;  // catches cases where the tile DIRECTLY BELOW (the clicked tile) is blank
+    // NOTE: the cases where there is a blank tile directly below will be caught by the checkUpLegal function
+    console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0 ${bool3}`);
+    return bool1 && bool2 && bool3;
 }
 
 function checkUp(colIdx, rowIdx) {
-    console.log(`CURRENT tile is: board[${colIdx}][${rowIdx}]`);
+    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}; tempBoard value is: ${tempBoard[colIdx][rowIdx]}`);
     console.log(`the value of the tile ABOVE (c[${colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
     rowIdx--; // compensating for console.log above; 
     console.log(`value of rowIdx w/compensation: ${rowIdx}`);
 
     if (board[colIdx][++rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
-        if (checkUpLegal(colIdx, rowIdx)) {
+        if (checkDownLegal(colIdx, rowIdx)) {   // PAY ATTENTION HERE: 1400
             console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
-            return tempBoard;
+            return board = tempBoard;
         } else {
             console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
             return board;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
-        console.log(`in else if; board[${colIdx}][${rowIdx}] === ${turn} is ${board[colIdx][rowIdx] === turn}`);
-        tempBoard[colIdx][rowIdx] = turn;
+        console.log(`in else if; board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === turn (${turn}) is ${board[colIdx][rowIdx] === turn}`);
+        tempBoard[colIdx][rowIdx] = turn;   // something is going on here
         // console.log(`board: ${board}; tempBoard ${tempBoard}`);
         checkUp(colIdx, rowIdx);
     } else {
@@ -227,20 +244,27 @@ function checkUp(colIdx, rowIdx) {
 
 }
 
-function checkUpLegal(colIdx, rowIdx) {
-    let bool1 = rowIdx < board[colIdx].length;
-    console.log(`rowIdx < board[${colIdx}].length: ${bool1}`);
-    // let bool2 = board[colIdx][rowIdx] !== board[colIdx][++rowIdx];
-    let bool2 = turn !== board[colIdx][++rowIdx];
+function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE clicked tile 
+    console.log("In checkUpLegal()");
+    console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
+    console.log(`checking - board[${colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
+    rowIdx--; // compensating for console.log above; 
+    let bool1 = ++rowIdx < board[colIdx].length; // catches cases where the rowIdx checked is higher than the ceiling (index 7);
+    // NOTE: the cases where clicking on row 7 is legal will be caught by the checkDownLegal function
+    rowIdx--;
+    console.log(`bool1: rowIdx < board[${colIdx}].length: ${bool1}`);
+
+    let bool2 = turn !== board[colIdx][++rowIdx];  
+    // checks that the chip ABOVE you belongs to the opponent; i.e. should have a DIFFERENT turn value in order to be true
     rowIdx--; //compensating for console.log above;
     // console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
-    console.log(`turn (${turn}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
+    console.log(`bool2: turn (${turn}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
     rowIdx--; //compensating for console.log above;
 
-
-    let bool3 = board[colIdx][++rowIdx]!==0;
-    // don't have to worry about dec'ing this ++rowIdx because this is the last boolean that uses it for logic
-    console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0 ${bool3}`);
+    let bool3 = board[colIdx][++rowIdx] !== 0; // catches cases where the tile DIRECTLY ABOVE (the clicked tile) is blank
+    // NOTE: the cases where there is a blank tile directly above will be caught by the checkDownLegal function
+    // also, don't have to worry about dec'ing this ++rowIdx because this is the last boolean that uses it for logic
+    console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0 ${bool3}`);
     return bool1 && bool2 && bool3;
     // so long as the value of turn for the tile ABOVE you is NOT the same AND is NOT 0, AND is within the bounds
 }
@@ -257,7 +281,18 @@ function init() {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
     ];
-    tempBoard = board;
+    // tempBoard = board;   
+    tempBoard = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, -1, 0, 0, 0],      
+        [0, 0, 0, -1, 1, 0, 0, 0],      
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+        // for some reason, BOARD will take whatever changes I make to TEMPBOARD
+    ];
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     render();   // call render to have the front-end reflect app state
@@ -305,20 +340,24 @@ function handleClick(evt) {
     if ((board[colIdx][rowIdx]) || winner) return;
     // handles cases where there is an existing value in a tile or if winner is found
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
-   
+
     // console.log(`checkDownLegal(colIdx,rowIdx): ${checkDownLegal(colIdx,rowIdx)}
     // \ncheckUpLegal(colIdx,rowIdx): ${checkUpLegal(colIdx,rowIdx)}`);
-    console.log(`clicked on board[${colIdx}][${rowIdx}]`);
+    console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
-    if(checkDownLegal(colIdx,rowIdx)||checkUpLegal(colIdx,rowIdx)){
+    if (checkDownLegal(colIdx, rowIdx) || checkUpLegal(colIdx, rowIdx)) {
         board[colIdx][rowIdx] = turn;
+        tempBoard[colIdx][rowIdx] = turn;
+        
+        // you have to assign the value of this nested index inside of this comprehensive if statement; otherwise,
+        // you could have a case where you assign a turn value without making sure the move is legal in the first place
         console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
         // set the nested index to be whichever player's turn it is 
-        checkDown(colIdx, rowIdx);
-        checkUp(colIdx, rowIdx);
+        if(checkDownLegal(colIdx,rowIdx)) checkDown(colIdx, rowIdx);
+        if(checkUpLegal(colIdx,rowIdx)) checkUp(colIdx, rowIdx);
         turn *= -1; // necessarily need this here, because so long as the player hasn't clicked, it is STILL that player's turn
         // hands the turn back over to the other player; look at init() for initial turn value
-    } 
+    }
     // this if statement above will need to include the checkLegals for all directions; also, we want to use
     // the OR gates because so long as ONE of checks are legal, we can let the user click there
     // TODO worry about changing the border to dashed and hover/mouseEnter logic
