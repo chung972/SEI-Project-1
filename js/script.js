@@ -282,6 +282,163 @@ function checkUp(colIdx, rowIdx) {
         return;
     }
 }
+
+function checkTopLeft(colIdx, rowIdx){
+    console.log("-------------------------------------------");
+    console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`the value of the tile ABOVE and LEFT (c[${--colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    rowIdx--; // compensating for console.log above; 
+    colIdx++;
+    console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
+
+    if (board[--colIdx][++rowIdx] === turn) {
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        let bool1 = checkBotRightLegal(colIdx, rowIdx);
+        if (bool1) {
+            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
+            console.log(`checkBotRightLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
+            globalCol = colIdx;
+            globalRow = rowIdx;
+        } else {
+            resetGlobalIdx();
+            console.log(`checkBotRightLegal returned ${bool1}`);
+            return;   // if checkDown returns FALSE, do nothing; just return
+        }
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
+        console.log("in else if; you are about to recurse");
+        checkTopLeft(colIdx, rowIdx);    // RECURSION OVER HERE
+
+    } else {
+        resetGlobalIdx();
+        console.log("do nothing");
+        return;
+    }
+}
+
+function checkTopRight(colIdx, rowIdx){
+    console.log("-------------------------------------------");
+    console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`the value of the tile ABOVE and RIGHT (c[${++colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    rowIdx--; // compensating for console.log above; 
+    colIdx--;
+    console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
+
+    if (board[++colIdx][++rowIdx] === turn) {
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        let bool1 = checkBotLeftLegal(colIdx, rowIdx);
+        if (bool1) {
+            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
+            console.log(`checkBotLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
+            globalCol = colIdx;
+            globalRow = rowIdx;
+        } else {
+            resetGlobalIdx();
+            console.log(`checkBotLeftLegal returned ${bool1}`);
+            return;   // if checkDown returns FALSE, do nothing; just return
+        }
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
+        console.log("in else if; you are about to recurse");
+        checkTopLeft(colIdx, rowIdx);    // RECURSION OVER HERE
+
+    } else {
+        resetGlobalIdx();
+        console.log("do nothing");
+        return;
+    }
+}
+
+function checkBotLeftLegal(colIdx, rowIdx){
+
+}
+
+function checkTopRightLegal(colIdx, rowIdx){
+    
+}
+
+function checkBotRight(colIdx, rowIdx) {
+    console.log("-------------------------------------------");
+    console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`the value of the tile BELOW and RIGHT (c[${++colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    rowIdx++;
+    colIdx--;
+    console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
+
+    if (board[++colIdx][--rowIdx] === turn) {
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        let bool1 = checkTopLeftLegal(colIdx, rowIdx);
+        if (bool1) {
+            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
+            console.log(`checkTopLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
+            globalCol = colIdx;
+            globalRow = rowIdx;
+        } else {
+            resetGlobalIdx();
+            console.log(`checkTopLeftLegal returned ${bool1}`);
+            return;   // if checkDown returns FALSE, do nothing; just return
+        }
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
+        console.log("in else if; you are about to recurse");
+        checkBotRight(colIdx, rowIdx);    // RECURSION OVER HERE
+
+    } else {
+        resetGlobalIdx();
+        console.log("do nothing");
+        return;
+    }
+}
+
+function checkTopLeftLegal(colIdx, rowIdx){
+    console.log("-------------------------------------------");
+    console.log("In checkDownLegal()");
+    console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
+    console.log(`checking - board[${--colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
+    rowIdx--;
+    colIdx++;
+
+    let bool1 = (++rowIdx < board[colIdx].length)&&(--colIdx > -1);  
+    console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length ${bool1}) AND (--colIdx (${colIdx}) > -1: ${bool1})`);
+    rowIdx--;
+    colIdx++;
+
+    let bool2 = board[--colIdx][++rowIdx] === (turn * -1);
+    console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
+    rowIdx--;
+    colIdx++;
+    
+    let bool3 = board[--colIdx][++rowIdx] !== 0; 
+    
+    console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
+    console.log("-------------------------------------------");
+    return bool1 && bool2 && bool3;
+}
+function checkBotRightLegal(colIdx, rowIdx){
+    console.log("-------------------------------------------");
+    console.log("In checkDownLegal()");
+    console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
+    console.log(`checking - board[${++colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
+    rowIdx++; // compensating for console.log above; 
+    colIdx--;
+
+    let bool1 = (--rowIdx > -1)&&(++colIdx < board.length);  
+    console.log(`bool1: (--rowIdx (${rowIdx}) > -1: ${bool1}) AND (++colIdx (${colIdx}) < board.length (${board.length}): ${bool1})`);
+    rowIdx++;
+    colIdx--;
+
+    let bool2 = board[++colIdx][--rowIdx] === (turn * -1);
+    console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
+    rowIdx++; //compensating for console.log above;
+    colIdx--;
+    
+    let bool3 = board[++colIdx][--rowIdx] !== 0; 
+    
+    console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
+    console.log("-------------------------------------------");
+    return bool1 && bool2 && bool3;
+}
+
 function checkLeft(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
@@ -535,7 +692,22 @@ function handleClick(evt) {
                 booly = true;
             }
         }
+        if (checkTopLeftLegal(colIdx, rowIdx)) {
+            checkTopLeft(colIdx, rowIdx);
+            if (!(globalCol === null || globalRow === null)) {
+                convert(colIdx, rowIdx, globalCol, globalRow);
+                booly = true;
+            }
+        }
         
+
+        if (checkBotRightLegal(colIdx, rowIdx)) {
+            checkBotRight(colIdx, rowIdx);
+            if (!(globalCol === null || globalRow === null)) {
+                convert(colIdx, rowIdx, globalCol, globalRow);
+                booly = true;
+            }
+        }
 
 
         if (booly) {
