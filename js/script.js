@@ -179,6 +179,12 @@ function checkDownLegal(colIdx, rowIdx) {
 function checkLeftLegal(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log("In checkLeftLegal()");
+
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
+    colIdx++;
+    if(--colIdx < 0) return false;
+    colIdx++;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${--colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     colIdx++;
@@ -198,11 +204,17 @@ function checkLeftLegal(colIdx, rowIdx){
 }
 
 function checkRightLegal(colIdx, rowIdx){
+
     console.log("-------------------------------------------");
     console.log("In checkRightLegal()");
+
+    console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
+    colIdx--;
+    if(++colIdx >= board.length) return false;
+    colIdx--;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${++colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);  
-    // JS doesn't like the fact that you can potentially go out of bounds of an array, and will throw an error
     colIdx--;
     
     let bool1 = ++colIdx < board.length;
@@ -353,6 +365,12 @@ function checkTopRight(colIdx, rowIdx){
 function checkBotLeftLegal(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log("In checkBotLeftLegal()");
+
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
+    colIdx++;
+    if(--colIdx < 0) return false;
+    colIdx++;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${--colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
     rowIdx++;
@@ -378,7 +396,7 @@ function checkBotLeftLegal(colIdx, rowIdx){
 function checkBotLeft(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
-    console.log(`the value of the tile BELOW and RIGHT (c[${--colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
+    console.log(`the value of the tile BELOW and RIGHT (c[${--colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);        // error thrown here
     rowIdx++;
     colIdx++;
     console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
@@ -410,11 +428,18 @@ function checkBotLeft(colIdx, rowIdx){
 
 function checkTopRightLegal(colIdx, rowIdx){
     console.log("-------------------------------------------");
-    console.log("In checkDownLegal()");
+    console.log("In checkTopRightLegal()");
+
+    console.log(`++colIdx (${colIdx++}) > board.length (${board.length}): ${colIdx > board.length}`);
+    colIdx--;
+    if(++colIdx >= board.length) return false;
+    colIdx--;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${++colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
     rowIdx--;
     colIdx--;
+
                 //  top if condition                   right if condition
     let bool1 = (++rowIdx < board[colIdx].length)&&(++colIdx < board.length);  
     console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length: ${bool1}) AND (++colIdx (${colIdx}) < board.length (${board.length}): ${bool1})`);
@@ -470,13 +495,19 @@ function checkBotRight(colIdx, rowIdx) {
 function checkTopLeftLegal(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log("In checkTopLeftLegal()");
+
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
+    colIdx++;
+    if(--colIdx < 0) return false;
+    colIdx++;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${--colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
     rowIdx--;
     colIdx++;
 
     let bool1 = (++rowIdx < board[colIdx].length)&&(--colIdx > -1);  
-    console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length ${bool1}) AND (--colIdx (${colIdx}) > -1: ${bool1})`);
+    console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length ${bool1}) AND (--colIdx (${colIdx}) > -1): ${bool1}`);
     rowIdx--;
     colIdx++;
 
@@ -494,6 +525,12 @@ function checkTopLeftLegal(colIdx, rowIdx){
 function checkBotRightLegal(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log("In checkBotRightLegal()");
+
+    console.log(`++colIdx (${++colIdx})> board.length (${board.length}) is: ${colIdx > board.length}`);
+    colIdx--;
+    if(++colIdx >= board.length) return false;
+    colIdx--;
+
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
     console.log(`checking - board[${++colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
     rowIdx++; // compensating for console.log above; 
@@ -552,27 +589,26 @@ function checkRight(colIdx, rowIdx){
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
     console.log(`the value of the tile LEFT (c[${++colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    colIdx--; // compensating for console.log above; 
+    colIdx--; 
     console.log(`value of colIdx w/compensation: ${colIdx}`);
 
     if (board[++colIdx][rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkLeftLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            console.log(`checkRightLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            let tempArr = [colIdx, rowIdx]; 
+            console.log(`checkLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
         } else {
             resetGlobalIdx();
-            console.log(`checkRightLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            console.log(`checkLeftLegal returned ${bool1}`);
+            return;   
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
         console.log("in else if; you are about to recurse");
         checkRight(colIdx, rowIdx);    // RECURSION OVER HERE
-
     } else {
         resetGlobalIdx();
         console.log("do nothing");
@@ -580,26 +616,6 @@ function checkRight(colIdx, rowIdx){
     }
 }
 
-/**
-     * So, what's going on here is that by RE-ASSIGNING board to tempBoard, we then LOSE the original reference to board; this is bad in cases where (for example) we are looking UP from the click point and realize it would be an ILLEGAL move
-     * let's stick to JUST mutating the regular board, so we don't lose the reference
-     * another potential solution would be assigning board to be a CONST, which would protect it from us losing the original reference
-     * however, we would be unable to re-assign board to point to tempboard (and thereby reflect all the conversions);
-     * on the topic of making board a CONST, if we made it a CONST OBJECT (of nested objects?), we could still mutate its keys 
-     * https://zellwk.com/blog/looping-through-js-objects/
-     * 
-     * FUCK IT. LET'S TRY JUST USING ONE BOARD OBJECT jfc
-     * 
-     * 
-     * YOOOOOOOOOO. alright, so what about this. we totally remove any element of touching board/tempBoard from the check methods
-     * and instead, all we do is return a value. to be more specific, we return the coordinates of a legal move i.e. the nested index
-     * of one of your own chips. we already have checkLegal methods, so that'll take care of the cases where the player is trying to
-     * place one of their chips DIRECTLY adjacent to another of their pieces.then what we can do from there is 
-     * 
-     * keep recursively searching UNTIL you run into a false; or maybe until ALL are false'
-     * i think we already have a pretty good system in place with calling checkOppositeDirectionLegal whenever the next target tile 
-     * has the same turn value as the current global turn 
-     */
 
 // something is going on here; for some reason, board is taking on the value of tempBoard
 // May 7 0728; so instead of touching either board/tempBoard, let's try and return JUST the nested index of where we stopped
@@ -617,12 +633,16 @@ function checkRight(colIdx, rowIdx){
 // for loop (which i think is more appropriate than forEach here) to set the board[col][row] as you traverse
 
 function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
-    let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;
+    let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;       // CATCH CASE OF 0
     let rowCounter = (Math.sign(sourceRowIdx - targetRowIdx) === 1) ? -1 : 1;
+    // ternary operators that will set col/rowCounter to be -1 or 1 depending on the result of Math.sign(); for example, if Math.sign()
+    // returns 1, that means that the source index is GREATER than the target index; therefore, we want to be decrementing (or adding
+    // a negative)
     let colArr = [];
     let rowArr = [];
 
     console.log(`Math.abs(srcColIdx(${sourceColIdx})-trgtColIdx(${targetColIdx}) ) is: ${Math.abs(sourceColIdx - targetColIdx)}`)
+    // the two for loops below 
     for (let i = 0; i < Math.abs(sourceColIdx - targetColIdx); i++) {
         colArr.push(sourceColIdx + (colCounter * (i + 1)));
         console.log(`colArr just pushed  ${i}; colArr now holds: ${colArr}`)
