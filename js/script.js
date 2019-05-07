@@ -6,7 +6,7 @@ const PLAYERS = {
 };
 
 /*----- app's state (variables) -----*/
-var board, tempBoard, winner, turn;
+var board, winner, turn;
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
 
@@ -14,22 +14,8 @@ var board, tempBoard, winner, turn;
 
 
 /**
- *   TODO need a boolean var to track whether a move is legal? would need
-     an accompanying function; would we need to keep it global if it 
-     would only live in handleClick? maybe need an entirely new function
-     handleHover? might be easier just to set borderstyle based on whether or not
-     PLAYERS[content] === 0 (plus other conditions)
-     in fact, it's looking more and more likely that we WILL need a separate eventListener
-     (it's called mouseENTER not hover; hover is css); when you ENTER, check if that move is
-     legal depending on CURRENT turn
 
-     maybe need to make checkCol/Row/Fwd-BckDiags more general? maybe just return true?, then
-     depending on that we can perform whatever action. i say this so we can stay DRY; 
-     well you wouldn't be able to click at all in the first place if a move was illegal
-     when you CLICK (which, again, can ONLY HAPPEN if a move is LEGAL), you are firstly,
-     setting that div/tile to hold a value of the CURRENT TURN; you are also calling on render
-     to reflect that update in the app state; the click should then call on a function to convert
-     whatever 
+
 
      OH BITCH. LISTEN. so. we have a board array, right? and we have a handle on that fucker.
      so. just have an array holding other arrays? or maybe just the coordinates? when we call on 
@@ -90,46 +76,9 @@ var board, tempBoard, winner, turn;
     LATEST COMMENTS [1526]
 
     recursion STOPS once you return a value
-    when you call on check, it is built in with inc/decrement
-    e.g.  - 
-    checkDown(colIdx, rowIdx) {
-        do something
-        checkDown(colIdx, --rowIdx)
-            for checkDOWN, we DECREMENT rowIdx here because of how the board is generated (since it builds from index of 0 to max)
-            and colIdx stays the same, obviously
-    }
 
-    if board[colIdx][--rowIdx] === YOUR TURN, checkLegal()
-    if board[colIdx][--rowIdx] === ENEMY TURN, turn *= -1, check(--colIdx, rowIdx)  <--(we'll still use checkDown for this example)
-    if board[colIdx][--rowIdx] === 0 OR out of bounds, just return; you've already handled the other cases
-        maybe just do } else { return } (since outside of the case that the tile is yours or the enemy, you're just going to return)
 
-    create a convert() function that will swap the values of board and tempBoard
 
-    going to need a checkLegal() function. should accept CURRENT colIdx and rowIdx
-
-    again, using the checkDown() example, we would have something like this:
-        checkDown(colIdx, rowIdx) {
-            // check down will always look BELOW its current position; it WILL NOT EVALUATE the current position
-            if(board[colIdx][--rowIdx] === PLAYERS[turn]){    means if it is your chip
-                if(checkLegal(colIdx, rowIdx)){
-                    return tempBoard;
-                } else{
-                    return board;
-                }
-            } else if (board[colIdx][--rowIdx] === PLAYERS[turn*-1]){     means if it is an ENEMY chip
-                tempBoard[colIdx][--rowIdx] *= -1;
-                checkDown(colIdx, --rowIdx);
-            } else{
-                return;
-            }
-        }
-             
-        function checkLegal(colIdx, rowIdx){
-            return (board[++colIdx][rowIdx] !== board[colIdx][rowIdx]);
-                this just means that if the turn (aka PLAYER) ABOVE the current tile is DIFFERENT (!==), then return true
-                if they are the SAME return false - meaning you're trying to place a chip right next to your own 
-        }
 
     
         i think you're going to have to end up doing check every cardinal direction as have isLegal() methods for each direction as well
@@ -157,7 +106,7 @@ init(); // call the init function so the game starts upon loading
 
 
 function checkDown(colIdx, rowIdx) {
-    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}; tempBoard value is: ${tempBoard[colIdx][rowIdx]}`);
+    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}`);
     console.log(`the value of the tile BELOW (c[${colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
     //note how after we PREfix (--rowIdx), we can just call board[cIdx][rIdx] and we get the correct value of turn
     rowIdx++; // compensating for console.log above; 
@@ -168,22 +117,19 @@ function checkDown(colIdx, rowIdx) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         if (checkDownLegal(colIdx, rowIdx)) {   // because we decremented in the if statement above, don't need to dec again
             console.log(`checkDownLegal returned ${checkDownLegal(colIdx, rowIdx)}`);
-            return tempBoard;
+            return;
         } else {
             console.log(`checkDownLegal returned ${checkDownLegal(colIdx, rowIdx)}`);
-            return board;
+            return;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         // since that first IF didn't return true, we skip that block, then we go to the next, HOWEVER, since we DID run
         // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
         // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
         // to anything (which would require an '=')
-        console.log(`in else if; board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === turn (${turn}) is ${board[colIdx][rowIdx] === turn}`);
-        tempBoard[colIdx][rowIdx] = turn;
         // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
         // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
         // set the tempBoard at this nested index to hold the converted tile value 
-        console.log(`board: ${board}; tempBoard ${tempBoard}`);
         checkDown(colIdx, rowIdx);
     } else {
         console.log("do nothing");
@@ -203,8 +149,8 @@ function checkDownLegal(colIdx, rowIdx) {
     // NOTE: the cases where clicking on row 0 is legal will be caught by the checkUpLegal function
     console.log(`bool1: --rowIdx (${rowIdx}) > -1: ${bool1}`);
     rowIdx++;
-    
-    let bool2 = turn !== board[colIdx][--rowIdx]; 
+
+    let bool2 = turn !== board[colIdx][--rowIdx];
     // checks that the chip BELOW you belongs to the opponent; i.e. in order to be true, the value of that tile should 
     // have a DIFFERENT turn value
     rowIdx++; //compensating for console.log above;
@@ -218,7 +164,7 @@ function checkDownLegal(colIdx, rowIdx) {
 }
 
 function checkUp(colIdx, rowIdx) {
-    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}; tempBoard value is: ${tempBoard[colIdx][rowIdx]}`);
+    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}]; board value is: ${board[colIdx][rowIdx]}`);
     console.log(`the value of the tile ABOVE (c[${colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
     rowIdx--; // compensating for console.log above; 
     console.log(`value of rowIdx w/compensation: ${rowIdx}`);
@@ -227,15 +173,14 @@ function checkUp(colIdx, rowIdx) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkDownLegal(colIdx, rowIdx);
         if (bool1) {   // PAY ATTENTION HERE: 1400
-            console.log(`checkDownLegal returned ${bool1}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            return board = tempBoard;                           // if checkDown is TRUE, then return the current values of col/rowIdx
+            let array1 = [colIdx, rowIdx]; // TRACK DOWN ARR
+            console.log(`checkDownLegal returned ${bool1}; the returned coordinates (array1) are (heh): ${array1}; array1[0]: ${array1[0]} is a typeof ${typeof array1[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            return array1;                           // if checkDown is TRUE, then return the current values of col/rowIdx
         } else {
             console.log(`checkDownLegal returned ${bool1}`);
-            return board;   // if checkDown returns FALSE, do nothing; just return
+            return;   // if checkDown returns FALSE, do nothing; just return
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        console.log(`in else if; board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === turn (${turn}) is ${board[colIdx][rowIdx] === turn}`);
-
         /**
          * So, what's going on here is that by RE-ASSIGNING board to tempBoard, we then LOSE the original reference to board; this is bad in cases where (for example) we are looking UP from the click point and realize it would be an ILLEGAL move
          * let's stick to JUST mutating the regular board, so we don't lose the reference
@@ -257,7 +202,7 @@ function checkUp(colIdx, rowIdx) {
          * has the same turn value as the current global turn 
          */
 
-        tempBoard[colIdx][rowIdx] = turn;   // something is going on here; for some reason, board is taking on the value of tempBoard
+        // something is going on here; for some reason, board is taking on the value of tempBoard
         // May 7 0728; so instead of touching either board/tempBoard, let's try and return JUST the nested index of where we stopped
         // this position will ONLY be returned if the move is legal, otherwise, we are either in recursion or we return and do nothing
         // like what would be the case if the next tile is 0 or out of bounds
@@ -271,8 +216,6 @@ function checkUp(colIdx, rowIdx) {
         // which we can set up to execute a code block within an if statement; so in this case, we would add
         // then once we've figured out exactly how many indices apart the source col/row are from the target, you can use a nested
         // for loop (which i think is more appropriate than forEach here) to set the board[col][row] as you traverse
-        console.log(`board[${colIdx}][${rowIdx}]: (${board[colIdx][rowIdx]}); tempBoard[${colIdx}][${rowIdx}] (${tempBoard[colIdx][rowIdx]})`);
-        console.log(`board: ${board}; tempBoard ${tempBoard}`);
         checkUp(colIdx, rowIdx);    // RECURSION OVER HERE
     } else {
         console.log("do nothing");
@@ -280,22 +223,49 @@ function checkUp(colIdx, rowIdx) {
     }
 }
 
-function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx){
-    let colCounter = 0;
-    let rowCounter = 0;
-    if(Math.sign(sourceColIdx-targetColIdx) === 1){
-        colCounter = -1;    
-        // what this means is that if the DIFFERENCE between the SOURCE and TARGET column indices are POSITIVE, then the srcColIdx
-        // is necessarily greater than the trgtColIdx, which means we need to decrement in the for loops below 
-    } else if (Math.sign(sourceColIdx-targetColIdx) === -1){
-        colCounter = 1
-    }   // do we need to add an else at the end of an else if? or can we just leave it?
+function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
+    let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;
+    let rowCounter = (Math.sign(sourceRowIdx - targetRowIdx) === 1) ? -1 : 1;
+    let colArr = [];
+    let rowArr = [];
 
-    if(Math.sign(sourceRowIdx-targetRowIdx) === 1){
-        rowCounter = -1;
-    } else if (Math.sign(sourceRowIdx-targetRowIdx) === -1){
-        rowCounter = 1;
+    console.log(`Math.abs(srcColIdx(${sourceColIdx})-trgtColIdx(${targetColIdx}) ) is: ${Math.abs(sourceColIdx - targetColIdx)}`)
+    for (let i = 0; i < Math.abs(sourceColIdx - targetColIdx); i++) {
+        colArr.push(sourceColIdx + (colCounter * (i + 1)));
+        console.log(`colArr just pushed  ${i}; colArr now holds: ${colArr}`)
     }
+
+    console.log("-------------------------------------------");
+    
+    console.log(`Math.abs(srcRowIdx(${sourceRowIdx})-trgtRowIdx(${targetRowIdx}) ) is: ${Math.abs(sourceRowIdx - targetRowIdx)}`)
+    for (let i = 0; i < Math.abs(sourceRowIdx - targetRowIdx); i++) {
+        rowArr.push(sourceRowIdx + (rowCounter * (i + 1)));
+        console.log(`rowArr just pushed  ${i}; rowArr now holds: ${rowArr}`)
+    }
+    console.log("-------------------------------------------");
+    
+    // you won't ever have a case where col and row "steps" (think about the diagonal cases) are off by more than one. 
+    if (colArr.length === 0) {  // catches cases where only the ROW changes; set the colIdx to be source
+        console.log("colArr.length === 0");
+        let limit = rowArr.length;
+        for (let i = 0; i < limit; i++) {
+            board[sourceColIdx][rowArr.pop()] = turn;
+        }
+    } else if (rowArr.length === 0) {   // catches cases where only the COLUMN changes; set the rowIdx to source
+        console.log("rowArr.length === 0");
+        let limit = colArr.length;
+        for (let i = 0; i < limit; i++) {
+            board[colArr.pop()][sourceRowIdx] = turn;
+        }
+    } else {
+        console.log("rowArr.length !== 0 and colArr.length !== 0");
+        let limit = colArr.length;
+        for (let i = 0; i < limit; i++) {
+            board[colArr.pop()][rowArr.pop()] = turn;
+        }
+    }
+    // just have to make sure that the coordinates you feed in to convert() stop BEFORE your own tile (i guess it wouldn't)
+    // technically matter if you color over your own tile, but still; also, this method will NOT color the clicked tile
 }
 
 function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE clicked tile 
@@ -308,7 +278,7 @@ function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE click
     rowIdx--;
     console.log(`bool1: rowIdx < board[${colIdx}].length: ${bool1}`);
 
-    let bool2 = board[colIdx][++rowIdx] === (turn * -1);  
+    let bool2 = board[colIdx][++rowIdx] === (turn * -1);
     // checks that the chip ABOVE you belongs to the opponent; i.e. should have a DIFFERENT turn value in order to be true
     rowIdx--; //compensating for console.log above;
     // console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
@@ -335,18 +305,7 @@ function init() {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
     ];
-    // tempBoard = board;   
-    tempBoard = [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, -1, 0, 0, 0],      
-        [0, 0, 0, -1, 1, 0, 0, 0],      
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-        // for some reason, BOARD will take whatever changes I make to TEMPBOARD
-    ];
+
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     render();   // call render to have the front-end reflect app state
@@ -401,14 +360,21 @@ function handleClick(evt) {
 
     if (checkDownLegal(colIdx, rowIdx) || checkUpLegal(colIdx, rowIdx)) {
         board[colIdx][rowIdx] = turn;
-        tempBoard[colIdx][rowIdx] = turn;
-        
+
         // you have to assign the value of this nested index inside of this comprehensive if statement; otherwise,
         // you could have a case where you assign a turn value without making sure the move is legal in the first place
         console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
         // set the nested index to be whichever player's turn it is 
-        if(checkDownLegal(colIdx,rowIdx)) checkDown(colIdx, rowIdx);
-        if(checkUpLegal(colIdx,rowIdx)) checkUp(colIdx, rowIdx);
+        if (checkDownLegal(colIdx, rowIdx)){
+            let arra = checkDown(colIdx, rowIdx);
+            console.log(arra);
+            convert(colIdx, rowIdx, arra[0], arra[1])
+        }
+        if (checkUpLegal(colIdx, rowIdx)){
+            let arra = checkUp(colIdx, rowIdx);
+            console.log(arra);
+            convert(colIdx, rowIdx, arra[0], arra[1])
+        } 
         turn *= -1; // necessarily need this here, because so long as the player hasn't clicked, it is STILL that player's turn
         // hands the turn back over to the other player; look at init() for initial turn value
     }
