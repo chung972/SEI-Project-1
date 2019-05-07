@@ -183,7 +183,7 @@ function checkDown(colIdx, rowIdx) {
         // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
         // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
         // set the tempBoard at this nested index to hold the converted tile value 
-        // console.log(`board: ${board}; tempBoard ${tempBoard}`);
+        console.log(`board: ${board}; tempBoard ${tempBoard}`);
         checkDown(colIdx, rowIdx);
     } else {
         console.log("do nothing");
@@ -225,23 +225,77 @@ function checkUp(colIdx, rowIdx) {
 
     if (board[colIdx][++rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
-        if (checkDownLegal(colIdx, rowIdx)) {   // PAY ATTENTION HERE: 1400
-            console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
-            return board = tempBoard;
+        let bool1 = checkDownLegal(colIdx, rowIdx);
+        if (bool1) {   // PAY ATTENTION HERE: 1400
+            console.log(`checkDownLegal returned ${bool1}`);    // HEY. This is checkDOWN!!!, NOT checkUP
+            return board = tempBoard;                           // if checkDown is TRUE, then return the current values of col/rowIdx
         } else {
-            console.log(`checkUpLegal returned ${checkUpLegal(colIdx, rowIdx)}`);
-            return board;
+            console.log(`checkDownLegal returned ${bool1}`);
+            return board;   // if checkDown returns FALSE, do nothing; just return
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) {
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
         console.log(`in else if; board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === turn (${turn}) is ${board[colIdx][rowIdx] === turn}`);
-        tempBoard[colIdx][rowIdx] = turn;   // something is going on here
-        // console.log(`board: ${board}; tempBoard ${tempBoard}`);
-        checkUp(colIdx, rowIdx);
+
+        /**
+         * So, what's going on here is that by RE-ASSIGNING board to tempBoard, we then LOSE the original reference to board; this is bad in cases where (for example) we are looking UP from the click point and realize it would be an ILLEGAL move
+         * let's stick to JUST mutating the regular board, so we don't lose the reference
+         * another potential solution would be assigning board to be a CONST, which would protect it from us losing the original reference
+         * however, we would be unable to re-assign board to point to tempboard (and thereby reflect all the conversions);
+         * on the topic of making board a CONST, if we made it a CONST OBJECT (of nested objects?), we could still mutate its keys 
+         * https://zellwk.com/blog/looping-through-js-objects/
+         * 
+         * FUCK IT. LET'S TRY JUST USING ONE BOARD OBJECT jfc
+         * 
+         * 
+         * YOOOOOOOOOO. alright, so what about this. we totally remove any element of touching board/tempBoard from the check methods
+         * and instead, all we do is return a value. to be more specific, we return the coordinates of a legal move i.e. the nested index
+         * of one of your own chips. we already have checkLegal methods, so that'll take care of the cases where the player is trying to
+         * place one of their chips DIRECTLY adjacent to another of their pieces.then what we can do from there is 
+         * 
+         * keep recursively searching UNTIL you run into a false; or maybe until ALL are false'
+         * i think we already have a pretty good system in place with calling checkOppositeDirectionLegal whenever the next target tile 
+         * has the same turn value as the current global turn 
+         */
+
+        tempBoard[colIdx][rowIdx] = turn;   // something is going on here; for some reason, board is taking on the value of tempBoard
+        // May 7 0728; so instead of touching either board/tempBoard, let's try and return JUST the nested index of where we stopped
+        // this position will ONLY be returned if the move is legal, otherwise, we are either in recursion or we return and do nothing
+        // like what would be the case if the next tile is 0 or out of bounds
+        // this would also mean we would need a CONVERSION method to run within handleClick (so that we know where we're starting from;
+        // or perhaps we could run it from within the if statement if checkDownLegal (within checkUp() returns true)
+        // what would a CONVERSION() function do? would need to accept 4 args? a col/rowIdx from source and a target col/rowIdx
+        // maybe we could make Conversion() robust and incorporate Math.sign(); what we can do to determine whether we will be 
+        // incrementing or decrementing the source indices (which won't necessarily both be the same; e.g. NE, NW, SE, SW) is to
+        // subtract the source index from the target; then let the sign that's returned decide; so for example, let's say
+        // we're trying to convert from (3,1) to (3,7). 3-3===0 so, don't inc/dec; 1-7 = -6. if call Math.sign(1-7), it will return -1
+        // which we can set up to execute a code block within an if statement; so in this case, we would add
+        // then once we've figured out exactly how many indices apart the source col/row are from the target, you can use a nested
+        // for loop (which i think is more appropriate than forEach here) to set the board[col][row] as you traverse
+        console.log(`board[${colIdx}][${rowIdx}]: (${board[colIdx][rowIdx]}); tempBoard[${colIdx}][${rowIdx}] (${tempBoard[colIdx][rowIdx]})`);
+        console.log(`board: ${board}; tempBoard ${tempBoard}`);
+        checkUp(colIdx, rowIdx);    // RECURSION OVER HERE
     } else {
         console.log("do nothing");
         return;
     }
+}
 
+function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx){
+    let colCounter = 0;
+    let rowCounter = 0;
+    if(Math.sign(sourceColIdx-targetColIdx) === 1){
+        colCounter = -1;    
+        // what this means is that if the DIFFERENCE between the SOURCE and TARGET column indices are POSITIVE, then the srcColIdx
+        // is necessarily greater than the trgtColIdx, which means we need to decrement in the for loops below 
+    } else if (Math.sign(sourceColIdx-targetColIdx) === -1){
+        colCounter = 1
+    }   // do we need to add an else at the end of an else if? or can we just leave it?
+
+    if(Math.sign(sourceRowIdx-targetRowIdx) === 1){
+        rowCounter = -1;
+    } else if (Math.sign(sourceRowIdx-targetRowIdx) === -1){
+        rowCounter = 1;
+    }
 }
 
 function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE clicked tile 
@@ -254,11 +308,11 @@ function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE click
     rowIdx--;
     console.log(`bool1: rowIdx < board[${colIdx}].length: ${bool1}`);
 
-    let bool2 = turn !== board[colIdx][++rowIdx];  
+    let bool2 = board[colIdx][++rowIdx] === (turn * -1);  
     // checks that the chip ABOVE you belongs to the opponent; i.e. should have a DIFFERENT turn value in order to be true
     rowIdx--; //compensating for console.log above;
     // console.log(`board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
-    console.log(`bool2: turn (${turn}) !== board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}): ${bool2}`);
+    console.log(`bool2: turn (board[${colIdx}][${++rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     rowIdx--; //compensating for console.log above;
 
     let bool3 = board[colIdx][++rowIdx] !== 0; // catches cases where the tile DIRECTLY ABOVE (the clicked tile) is blank
