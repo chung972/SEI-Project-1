@@ -178,7 +178,7 @@ function checkLeftLegal(colIdx, rowIdx) {
 
     console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -297,9 +297,9 @@ function checkTopLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
 
-    console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false;
     colIdx++;
 
     console.log(`the value of the tile ABOVE and LEFT (c[${--colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -379,7 +379,7 @@ function checkBotLeftLegal(colIdx, rowIdx) {
 
     console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -388,7 +388,7 @@ function checkBotLeftLegal(colIdx, rowIdx) {
     colIdx++;
 
     let bool1 = (--rowIdx > -1) && (--colIdx > -1);
-    console.log(`bool1: (--rowIdx (${rowIdx}) > -1: ${bool1}) AND (--colIdx (${colIdx}) > -1: ${bool1})`);
+    console.log(`bool1: (--rowIdx (${rowIdx}) > -1: ${bool1}) AND (--colIdx (${colIdx}) > -1): ${bool1}`);
     rowIdx++;
     colIdx++;
 
@@ -410,7 +410,7 @@ function checkBotLeft(colIdx, rowIdx) {
 
     console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false;
     colIdx++;
 
     console.log(`the value of the tile BELOW and RIGHT (c[${--colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);        // error thrown here
@@ -523,7 +523,7 @@ function checkTopLeftLegal(colIdx, rowIdx) {
 
     console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -804,6 +804,8 @@ function handleClick(evt) {
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
+    let illegalCount = 0;
+
     let booly = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
 
@@ -819,6 +821,8 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
 
     if (checkDownLegal(colIdx, rowIdx)) {
@@ -827,6 +831,8 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
 
     if (checkLeftLegal(colIdx, rowIdx)) {
@@ -835,20 +841,28 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
+
     if (checkRightLegal(colIdx, rowIdx)) {
         checkRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // RIGHT
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
+
     if (checkTopLeftLegal(colIdx, rowIdx)) {
         checkTopLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // TOP LEFT
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
 
     if (checkTopRightLegal(colIdx, rowIdx)) {
@@ -857,6 +871,8 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
 
     if (checkBotLeftLegal(colIdx, rowIdx)) {
@@ -865,6 +881,8 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
 
     if (checkBotRightLegal(colIdx, rowIdx)) {
@@ -873,7 +891,15 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
+    } else{
+        illegalCount++;
     }
+    
+    // console.log(`illegalCount is now: ${illegalCount}; it is still Player ${(turn === 1) ? 1 : 2}'s turn`);
+    // if(illegalCount ===8){
+    //     console.log(`Player ${(turn === 1) ? 1 : 2}'s turn is forfeited.`)
+    //     turn *= -1;
+    // }
 
     if (booly) {
         board[colIdx][rowIdx] = turn;
@@ -888,8 +914,6 @@ function handleClick(evt) {
     }
 
     // TODO worry about changing the border to dashed and hover/mouseEnter logic
-
-    board.forEach
 
     console.log("calling render() from handleClick()");
     console.log("-------------------------------------------");
