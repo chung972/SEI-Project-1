@@ -40,6 +40,12 @@ body {
     font-weight: 500;
 }
 
+.status{
+    padding: 10px;
+    border-width: 5px;
+    border-style: solid;
+}
+
 section {
     display: grid;
     grid-template-columns: repeat(8, 8vmin);
@@ -48,13 +54,14 @@ section {
     background-color: #065241;
   }
 
-  section div {
+section div {
     border-radius: 50%;
     border: 5px solid grey;
     
 }
 section div:hover{
     border-style: dashed;
+    cursor: pointer;
 }
 
 .flexbox-ctr {
@@ -78,4 +85,19 @@ footer {
     display:flexbox;
     justify-content: center;
     
+}
+
+button{
+    cursor: pointer;
+    width: 100px;
+    height: 25px;
+    border: 2px solid black;
+    transition-duration: 0.5s;
+    border-radius: 12px;
+}
+
+button:hover{
+    background-color: black;
+    color:white;
+    border: 2px solid white;
 }

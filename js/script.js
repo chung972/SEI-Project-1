@@ -24,6 +24,8 @@ var globalRow = null;
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
 const p1Score = document.getElementById("p1Score");
 const p2Score = document.getElementById("p2Score");
+const p1Turn = document.querySelector("#colL p.status");
+const p2Turn = document.querySelector("#colR p.status");
 
 /*----- event listeners -----*/
 document.getElementById("board").addEventListener('click', handleClick);
@@ -689,6 +691,8 @@ function render() {
             // refer to const PLAYERS objecgt above for more
         });
     });
+    (turn === 1) ? p1Turn.style.borderColor="white" : p1Turn.style.borderColor="black";
+    (turn === -1) ? p2Turn.style.borderColor="black" : p2Turn.style.borderColor="white";
 }
 
 function handleClick(evt) {
