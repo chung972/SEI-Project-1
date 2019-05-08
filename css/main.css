@@ -82,7 +82,6 @@ footer {
 
 #board{
     grid-area: game;
-    display:flexbox;
     justify-content: center;
     
 }
