@@ -10,8 +10,9 @@ var board, winner, turn;
 
 var globalCol = null;
 var globalRow = null;
-var blackChipCount = 0;
-var whiteChipCount = 0;
+
+
+
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
 
@@ -20,18 +21,6 @@ var whiteChipCount = 0;
 
 /**
 
-
-
-     OH BITCH. LISTEN. so. we have a board array, right? and we have a handle on that fucker.
-     so. just have an array holding other arrays? or maybe just the coordinates? when we call on 
-     checkCol/Row/Diags, we will KNOW what turn value the tiles we iterate through will have.
-     so while we're iterating through them, store the enemy chips while we search for one of our own
-     (you get what i'm saying. until we find another of the current turn's player's color)
-     and so, depending on whether certain conditions are met, we can simply update the BOARD VAR ITSELF;
-     that is, change the values at whichever positions we were holding in that array; then call render on that
-     bitch. qed? remember, RENDER() IS RESPONSIBLE FOR ALL(?) FRONT END SHIT. WE DON'T NEED A SPECIFIC RENDER
-     FUCNTION FOR CONVERTING TILES. we WILL, however, need a specific function to change the app state of the 
-     board var (converting them, that is)
      
 
 
@@ -93,6 +82,8 @@ var whiteChipCount = 0;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
+const p1Score = document.querySelector("#colL p");
+const p2Score = document.querySelector("#colR p");
 
 /*----- event listeners -----*/
 document.getElementById("board").addEventListener('click', handleClick);
@@ -101,6 +92,8 @@ document.getElementById("board").addEventListener('click', handleClick);
 document.querySelector("button").addEventListener('click', init);
 // added a listener for our reset button; calls init on press; very elegant solution;
 // idea taken from tictactoe code-along w/Daniel
+
+
 
 // TODO maybe create a button or some other element that will popup (alert) user with 
 //      instructions? great idea taken from Yolie
@@ -129,6 +122,7 @@ function checkDown(colIdx, rowIdx) {
             // HEY. This is chekcUP!!!, NOT checkDOWN
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             console.log(`checkUpLegal returned ${bool1}`);
             resetGlobalIdx();
@@ -282,6 +276,7 @@ function checkUp(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkDownLegal returned ${bool1}`);
@@ -321,6 +316,7 @@ function checkTopLeft(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkBotRightLegal returned ${bool1}`);
@@ -360,6 +356,7 @@ function checkTopRight(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkBotLeftLegal returned ${bool1}`);
@@ -430,6 +427,7 @@ function checkBotLeft(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkTopRightLegal returned ${bool1}`);
@@ -502,6 +500,7 @@ function checkBotRight(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkTopLeftLegal returned ${bool1}`);
@@ -585,7 +584,7 @@ function checkLeft(colIdx, rowIdx) {
 
     console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx <= 0) return false;
+    if (--colIdx < 0) return false; // look here 
     colIdx++;
 
     console.log(`the value of the tile LEFT (c[${--colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -601,6 +600,7 @@ function checkLeft(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkRightLegal returned ${bool1}`);
@@ -623,7 +623,7 @@ function checkRight(colIdx, rowIdx) {
 
     console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return false;
     colIdx--;
 
     console.log(`the value of the tile LEFT (c[${++colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -639,6 +639,7 @@ function checkRight(colIdx, rowIdx) {
             // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
+            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             resetGlobalIdx();
             console.log(`checkLeftLegal returned ${bool1}`);
@@ -678,7 +679,9 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     // a negative)
     let colArr = [];
     let rowArr = [];
-
+    
+    console.log("-------------------------------------------");
+    console.log("In CONVERSION");
     console.log(`Math.abs(srcColIdx(${sourceColIdx})-trgtColIdx(${targetColIdx}) ) is: ${Math.abs(sourceColIdx - targetColIdx)}`)
     // the two for loops below 
     for (let i = 0; i < Math.abs(sourceColIdx - targetColIdx); i++) {
@@ -700,21 +703,28 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
         console.log("colArr.length === 0");
         let limit = rowArr.length;
         for (let i = 0; i < limit; i++) {
-            board[sourceColIdx][rowArr.pop()] = turn;
+            let holder = rowArr.pop();
+            board[sourceColIdx][holder] = turn;
+            console.log(`board[${sourceColIdx}][${holder}] now holds: ${turn}`);
         }
         console.log("-------------------------------------------");
     } else if (rowArr.length === 0) {   // catches cases where only the COLUMN changes; set the rowIdx to source
         console.log("rowArr.length === 0");
         let limit = colArr.length;
         for (let i = 0; i < limit; i++) {
-            board[colArr.pop()][sourceRowIdx] = turn;
+            let holder = colArr.pop();
+            board[holder][sourceRowIdx] = turn;
+            console.log(`board[${holder}][${sourceRowIdx}] now holds: ${turn}`)
         }
         console.log("-------------------------------------------");
     } else {
         console.log("rowArr.length !== 0 and colArr.length !== 0");
         let limit = colArr.length;
         for (let i = 0; i < limit; i++) {
-            board[colArr.pop()][rowArr.pop()] = turn;
+            let holder1 = colArr.pop();
+            let holder2 = rowArr.pop();
+            board[holder1][holder2] = turn;
+            console.log(`board[${holder1}][${holder2}] now holds: ${turn}`);
         }
         console.log("-------------------------------------------");
     }
@@ -766,11 +776,7 @@ function render() {
             
     
 
-            if(content===1){
-                ++blackChipCount;
-            } else if(content===-1){
-                ++whiteChipCount;
-            }
+
 
         });
     });
@@ -781,6 +787,8 @@ function render() {
 }
 
 function handleClick(evt) {
+    let blackChipCount = 0;
+    let whiteChipCount = 0;
     const tile = evt.target;
     // create a function scoped constant on the element that fired the event
     const colIdx = parseInt(tile.id.charAt(1));
@@ -886,7 +894,19 @@ function handleClick(evt) {
     console.log("calling render() from handleClick()");
     console.log("-------------------------------------------");
 
+    board.forEach(function(colArr, colIdx){
+        colArr.forEach(function(content, rowIdx){
+            if(content===1){
+                ++blackChipCount;
+                // console.log(`blackChipCount is: ${blackChipCount}`);
+                p1Score.textContent = `${blackChipCount}`;
+            } else if(content===-1){
+                ++whiteChipCount;
+                // console.log(`whiteChipCount is: ${whiteChipCount}`);
+                p2Score.textContent = `${whiteChipCount}`;
+            }
+        });
+    });
     render();
     // calls render() to have the front-end reflect the newly updated app state
-
 }
