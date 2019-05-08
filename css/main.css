@@ -21,17 +21,23 @@ body {
 
 #colL{
     grid-area: colL;
-    background-color: rgb(202, 202, 248);
+    background-color: black;
     text-align: center;
     font-size: 20px;
+    color: white;
 }
 
 #colR{
     grid-area: colR;
-    background-color: rgb(230, 176, 176);
+    background-color: white;
     text-align: center;
-    vertical-align: middle;
     font-size: 20px;
+}
+
+.score{
+    text-align: center;
+    font-size: 30px;
+    font-weight: 500;
 }
 
 section {
@@ -60,10 +66,11 @@ section div:hover{
 header {
     grid-area: title;
     font-size: 10vmin;
-    margin: 3vmin;
+    background-color: rgb(204, 204, 204);
 }
 footer {
     grid-area: bot;
+    background-color: rgb(204, 204, 204);
 }
 
 #board{

@@ -82,8 +82,8 @@ var globalRow = null;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
-const p1Score = document.querySelector("#colL p");
-const p2Score = document.querySelector("#colR p");
+const p1Score = document.getElementById("p1Score");
+const p2Score = document.getElementById("p2Score");
 
 /*----- event listeners -----*/
 document.getElementById("board").addEventListener('click', handleClick);
@@ -125,7 +125,6 @@ function checkDown(colIdx, rowIdx) {
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
             console.log(`checkUpLegal returned ${bool1}`);
-            resetGlobalIdx();
             return;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
@@ -139,7 +138,6 @@ function checkDown(colIdx, rowIdx) {
         // set the tempBoard at this nested index to hold the converted tile value 
         checkDown(colIdx, rowIdx);
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -176,7 +174,7 @@ function checkLeftLegal(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log("In checkLeftLegal()");
 
-    console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
     if (--colIdx < 0) return false;
     colIdx++;
@@ -204,9 +202,9 @@ function checkRightLegal(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log("In checkRightLegal()");
 
-    console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
+    console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return false;
     colIdx--;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -278,7 +276,6 @@ function checkUp(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkDownLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -287,7 +284,6 @@ function checkUp(colIdx, rowIdx) {
         checkUp(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -318,7 +314,6 @@ function checkTopLeft(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkBotRightLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -327,7 +322,6 @@ function checkTopLeft(colIdx, rowIdx) {
         checkTopLeft(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -337,9 +331,9 @@ function checkTopRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
 
-    console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
+    console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return false;
     colIdx--;
 
     console.log(`the value of the tile ABOVE and RIGHT (c[${++colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -358,7 +352,6 @@ function checkTopRight(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkBotLeftLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -367,7 +360,6 @@ function checkTopRight(colIdx, rowIdx) {
         checkTopRight(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -408,9 +400,9 @@ function checkBotLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
 
-    console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx < 0) return false;
+    if (--colIdx < 0) return;
     colIdx++;
 
     console.log(`the value of the tile BELOW and RIGHT (c[${--colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);        // error thrown here
@@ -429,7 +421,6 @@ function checkBotLeft(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkTopRightLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -438,7 +429,6 @@ function checkBotLeft(colIdx, rowIdx) {
         checkBotLeft(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -448,9 +438,9 @@ function checkTopRightLegal(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log("In checkTopRightLegal()");
 
-    console.log(`++colIdx (${colIdx++}) > board.length (${board.length}): ${colIdx > board.length}`);
+    console.log(`++colIdx (${colIdx++}) === board.length (${board.length}): ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return false;
     colIdx--;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -481,9 +471,9 @@ function checkBotRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
 
-    console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
+    console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return;
     colIdx--;
 
     console.log(`the value of the tile BELOW and RIGHT (c[${++colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -502,7 +492,6 @@ function checkBotRight(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkTopLeftLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -511,7 +500,6 @@ function checkBotRight(colIdx, rowIdx) {
         checkBotRight(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -551,9 +539,9 @@ function checkBotRightLegal(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log("In checkBotRightLegal()");
 
-    console.log(`++colIdx (${++colIdx})> board.length (${board.length}) is: ${colIdx > board.length}`);
+    console.log(`++colIdx (${++colIdx}) === board.length (${board.length}) is: ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx >= board.length) return false;
+    if (++colIdx === board.length) return false;
     colIdx--;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -582,9 +570,9 @@ function checkLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
 
-    console.log(`--colIdx (${--colIdx}) <= 0: ${colIdx < 0}`)
+    console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if (--colIdx < 0) return false; // look here 
+    if (--colIdx < 0) return;
     colIdx++;
 
     console.log(`the value of the tile LEFT (c[${--colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -602,7 +590,6 @@ function checkLeft(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkRightLegal returned ${bool1}`);
             return;   // if checkDown returns FALSE, do nothing; just return
         }
@@ -611,7 +598,6 @@ function checkLeft(colIdx, rowIdx) {
         checkLeft(colIdx, rowIdx);    // RECURSION OVER HERE
 
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -621,9 +607,9 @@ function checkRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
 
-    console.log(`++colIdx (${++colIdx}) > board.length (${board.length}): ${colIdx > board.length}`);
+    console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     colIdx--;
-    if (++colIdx === board.length) return false;
+    if (++colIdx === board.length) return;
     colIdx--;
 
     console.log(`the value of the tile LEFT (c[${++colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
@@ -641,7 +627,6 @@ function checkRight(colIdx, rowIdx) {
             globalRow = rowIdx;
             console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
         } else {
-            resetGlobalIdx();
             console.log(`checkLeftLegal returned ${bool1}`);
             return;
         }
@@ -649,7 +634,6 @@ function checkRight(colIdx, rowIdx) {
         console.log("in else if; you are about to recurse");
         checkRight(colIdx, rowIdx);    // RECURSION OVER HERE
     } else {
-        resetGlobalIdx();
         console.log("do nothing");
         return;
     }
@@ -679,7 +663,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     // a negative)
     let colArr = [];
     let rowArr = [];
-    
+
     console.log("-------------------------------------------");
     console.log("In CONVERSION");
     console.log(`Math.abs(srcColIdx(${sourceColIdx})-trgtColIdx(${targetColIdx}) ) is: ${Math.abs(sourceColIdx - targetColIdx)}`)
@@ -707,6 +691,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
             board[sourceColIdx][holder] = turn;
             console.log(`board[${sourceColIdx}][${holder}] now holds: ${turn}`);
         }
+        resetGlobalIdx();
         console.log("-------------------------------------------");
     } else if (rowArr.length === 0) {   // catches cases where only the COLUMN changes; set the rowIdx to source
         console.log("rowArr.length === 0");
@@ -716,6 +701,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
             board[holder][sourceRowIdx] = turn;
             console.log(`board[${holder}][${sourceRowIdx}] now holds: ${turn}`)
         }
+        resetGlobalIdx();
         console.log("-------------------------------------------");
     } else {
         console.log("rowArr.length !== 0 and colArr.length !== 0");
@@ -726,6 +712,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
             board[holder1][holder2] = turn;
             console.log(`board[${holder1}][${holder2}] now holds: ${turn}`);
         }
+        resetGlobalIdx();
         console.log("-------------------------------------------");
     }
     // just have to make sure that the coordinates you feed in to convert() stop BEFORE your own tile (i guess it wouldn't)
@@ -773,8 +760,8 @@ function render() {
             // note that the VALUE of PLAYERS[content] will depend on
             // the KEY that is passed in (the actual 'content' arg); 
             // refer to const PLAYERS objecgt above for more
-            
-    
+
+
 
 
 
@@ -804,8 +791,7 @@ function handleClick(evt) {
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
-    let illegalCount = 0;
-
+    let zeroCount = 0;
     let booly = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
 
@@ -821,8 +807,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkDownLegal(colIdx, rowIdx)) {
@@ -831,8 +815,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkLeftLegal(colIdx, rowIdx)) {
@@ -841,8 +823,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkRightLegal(colIdx, rowIdx)) {
@@ -851,8 +831,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkTopLeftLegal(colIdx, rowIdx)) {
@@ -861,8 +839,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkTopRightLegal(colIdx, rowIdx)) {
@@ -871,8 +847,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkBotLeftLegal(colIdx, rowIdx)) {
@@ -881,8 +855,6 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
 
     if (checkBotRightLegal(colIdx, rowIdx)) {
@@ -891,10 +863,8 @@ function handleClick(evt) {
             convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
-    } else{
-        illegalCount++;
     }
-    
+
     // console.log(`illegalCount is now: ${illegalCount}; it is still Player ${(turn === 1) ? 1 : 2}'s turn`);
     // if(illegalCount ===8){
     //     console.log(`Player ${(turn === 1) ? 1 : 2}'s turn is forfeited.`)
@@ -918,19 +888,107 @@ function handleClick(evt) {
     console.log("calling render() from handleClick()");
     console.log("-------------------------------------------");
 
-    board.forEach(function(colArr, colIdx){
-        colArr.forEach(function(content, rowIdx){
-            if(content===1){
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            if (content === 1) {
                 ++blackChipCount;
                 // console.log(`blackChipCount is: ${blackChipCount}`);
                 p1Score.textContent = `${blackChipCount}`;
-            } else if(content===-1){
+            } else if (content === -1) {
                 ++whiteChipCount;
                 // console.log(`whiteChipCount is: ${whiteChipCount}`);
                 p2Score.textContent = `${whiteChipCount}`;
+            } else {
+                zeroCount++;
             }
         });
     });
+    let forfeitBool = null;
+    if(zeroCount < 16) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY limit to start invoking checkForfeit()
+    console.log(`forfeit returned: ${forfeitBool}; zeroCount is: ${zeroCount}`);
+    // will need to flesh out win logic after this
+    if(forfeitBool || (zeroCount==0)) {
+        getWinner(blackChipCount, whiteChipCount);
+    }
+
     render();
     // calls render() to have the front-end reflect the newly updated app state
 }
+
+function getWinner(blackChips, whiteChips){
+    winner = (blackChips > whiteChips) ? 1 : -1;
+    alert(`Player ${(winner === 1) ? 1 : 2} wins!!!`);
+    return winner;
+}
+
+function checkForfeit() {
+    let forfeit = true;
+    console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn.`);
+
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            if (content === 0) {
+                if (checkUpLegal(colIdx, rowIdx)) {
+                    checkUp(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // UP
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkDownLegal(colIdx, rowIdx)) {
+                    checkDown(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // DOWN
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkLeftLegal(colIdx, rowIdx)) {
+                    checkLeft(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // LEFT
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkRightLegal(colIdx, rowIdx)) {
+                    checkRight(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // RIGHT
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkTopLeftLegal(colIdx, rowIdx)) {
+                    checkTopLeft(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // TOP LEFT
+                        return forfeit = false;
+                    }
+                }
+                if (checkTopRightLegal(colIdx, rowIdx)) {
+                    checkTopRight(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // TOP RIGHT
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkBotLeftLegal(colIdx, rowIdx)) {
+                    checkBotLeft(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // BOT LEFT
+                        return forfeit = false;
+                    }
+                }
+
+                if (checkBotRightLegal(colIdx, rowIdx)) {
+                    checkBotRight(colIdx, rowIdx);
+                    if (!(globalCol === null || globalRow === null)) {              // BOT RIGHT
+                        return forfeit = false;
+                    }
+                }
+
+            }
+        });
+    });
+    return forfeit;
+}
+/**
+ * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for those whose content === 0;
+ * because you can only ever place a chip on an empty tile;
+ */
