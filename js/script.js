@@ -182,7 +182,7 @@ function checkLeftLegal(colIdx, rowIdx){
 
     console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if(--colIdx < 0) return false;
+    if(--colIdx <= 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -368,7 +368,7 @@ function checkBotLeftLegal(colIdx, rowIdx){
 
     console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if(--colIdx < 0) return false;
+    if(--colIdx <= 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
@@ -498,7 +498,7 @@ function checkTopLeftLegal(colIdx, rowIdx){
 
     console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     colIdx++;
-    if(--colIdx < 0) return false;
+    if(--colIdx <= 0) return false;
     colIdx++;
 
     console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
