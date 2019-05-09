@@ -734,6 +734,8 @@ function handleClick(evt) {
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
+    let forfeitStatus = checkForfeit();
+
     let zeroCount = 0;
     let booly = false;
 
@@ -748,7 +750,7 @@ function handleClick(evt) {
     if (checkUpLegal(colIdx, rowIdx)) {
         checkUp(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // UP
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -756,7 +758,7 @@ function handleClick(evt) {
     if (checkDownLegal(colIdx, rowIdx)) {
         checkDown(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // DOWN
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -764,7 +766,7 @@ function handleClick(evt) {
     if (checkLeftLegal(colIdx, rowIdx)) {
         checkLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // LEFT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -772,7 +774,7 @@ function handleClick(evt) {
     if (checkRightLegal(colIdx, rowIdx)) {
         checkRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // RIGHT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -780,7 +782,7 @@ function handleClick(evt) {
     if (checkTopLeftLegal(colIdx, rowIdx)) {
         checkTopLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // TOP LEFT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -788,7 +790,7 @@ function handleClick(evt) {
     if (checkTopRightLegal(colIdx, rowIdx)) {
         checkTopRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // TOP RIGHT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -796,7 +798,7 @@ function handleClick(evt) {
     if (checkBotLeftLegal(colIdx, rowIdx)) {
         checkBotLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // BOT LEFT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -804,7 +806,7 @@ function handleClick(evt) {
     if (checkBotRightLegal(colIdx, rowIdx)) {
         checkBotRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // BOT RIGHT
-            convert(colIdx, rowIdx, globalCol, globalRow);
+            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -838,16 +840,15 @@ function handleClick(evt) {
         console.log(`turn just changed to: ${turn}`)
     }
 
-    let forfeitBool = null;
-    if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
-    console.log(`forfeit returned: ${forfeitBool}; zeroCount is: ${zeroCount}`);
+    // if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
+    console.log(`forfeitStatus returned: ${forfeitStatus}; zeroCount is: ${zeroCount}`);
     console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
     console.log("----------NEXT TURN STARTS BELOW----------");
-    if (forfeitBool) {
+    if (forfeitStatus) {
         turn *= -1;
         return;
     }
-    if (forfeitBool && (zeroCount == 0)) {
+    if (forfeitStatus && (zeroCount == 0)) {
         getWinner(blackChipCount, whiteChipCount);
         // still need to handle the case where BOTH players focus
         // how about making 2 global vars; p1FFstatus, p2FFstatus; initialize both to false
@@ -863,12 +864,17 @@ function handleClick(evt) {
 }
 
 function getWinner(blackChips, whiteChips) {
-    winner = (blackChips > whiteChips) ? 1 : -1;
-    // alert(`Player ${(winner === 1) ? 1 : 2} wins!!!`);
-    winBanner.style.visibility = "visible";
-    winBanner.style.color = `${PLAYERS[winner*-1]}`;
-    winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
-    return winner;
+    if(blackChips===whiteChips){
+        winBanner.style.visibility = "visible";
+        winBanner.textContent = "TIE GAME";
+        winBanner.style.color = "white";
+        winBanner.style.backgroundColor = "#065241";
+    } else{
+        winner = (blackChips > whiteChips) ? 1 : -1;
+        winBanner.style.visibility = "visible";
+        winBanner.style.color = `${PLAYERS[winner*-1]}`;
+        winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
+    }
 }
 
 function checkForfeit() {
