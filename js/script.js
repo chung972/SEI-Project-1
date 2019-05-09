@@ -735,20 +735,6 @@ function handleClick(evt) {
     let zeroCount = 0;
     let booly = false;
 
-    board.forEach(function (colArr, colIdx) {
-        colArr.forEach(function (content, rowIdx) {
-            if (content === 1) {
-                ++blackChipCount;
-                p1Score.textContent = `${blackChipCount}`;
-            } else if (content === -1) {
-                ++whiteChipCount;
-                p2Score.textContent = `${whiteChipCount}`;
-            } else {
-                zeroCount++;
-            }
-        });
-    });
-
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
 
     // first checks to make sure a move is legal (i.e. you are not clicking right next to a blank tile or
@@ -821,6 +807,20 @@ function handleClick(evt) {
         }
     }
 
+    // nested forEach()s to sum up all the white and black ships that are currently in the board app state
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            if (content === 1) {
+                ++blackChipCount;
+                p1Score.textContent = `${blackChipCount}`;
+            } else if (content === -1) {
+                ++whiteChipCount;
+                p2Score.textContent = `${whiteChipCount}`;
+            } else {
+                zeroCount++;
+            }
+        });
+    });
 
     if (booly) {
         board[colIdx][rowIdx] = turn;
@@ -848,7 +848,7 @@ function handleClick(evt) {
         // still need to handle the case where BOTH players focus
         // how about making 2 global vars; p1FFstatus, p2FFstatus; initialize both to false
         // then in these if statements here, if forfeit is true, set that global var to true
-        
+
         // consider wrapping handleClick() in another function that runs checkForfeit first
     }
     
