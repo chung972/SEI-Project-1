@@ -13,6 +13,7 @@ var globalCol = null;
 var globalRow = null;
 var blackChipCount = 0;
 var whiteChipCount = 0;
+var zeroCount = 0;
 var p1Forfeit = false;
 var p2Forfeit = false;
 
@@ -669,6 +670,7 @@ function init() {
     resetGlobalIdx();
     blackChipCount = 0;
     whiteChipCount = 0;
+    // need to assign black/whiteChipCount to 0 here to catch cases when a player hits the reset button
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
@@ -748,23 +750,8 @@ function handleClickDo(evt) {
     // it may seem to appear unnecessary to check EACH direction, but it is better to SEPARATE OUR CONCERNS
     // and have SINGLE POINTS OF FAILURE
     let booly = checkAll(colIdx, rowIdx);
+    console.log(`booly is: ${booly}`);
 
-    blackChipCount = 0;
-    whiteChipCount = 0;
-    // nested forEach()s to sum up all the white and black ships that are currently in the board app state
-    board.forEach(function (colArr, colIdx) {
-        colArr.forEach(function (content, rowIdx) {
-            if (content === 1) {
-                ++blackChipCount;
-                p1Score.textContent = `${blackChipCount}`;
-            } else if (content === -1) {
-                ++whiteChipCount;
-                p2Score.textContent = `${whiteChipCount}`;
-            } else {
-                zeroCount++;
-            }
-        });
-    });
 
     if (booly) {
         board[colIdx][rowIdx] = turn;
@@ -778,32 +765,9 @@ function handleClickDo(evt) {
         console.log(`turn just changed to: ${turn}`)
     }
 
-    let forfeitBool = null;
-    if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
-    console.log(`forfeit returned: ${forfeitBool}; zeroCount is: ${zeroCount}`);
+    console.log(`zeroCount is: ${zeroCount}`);
     console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
     console.log("----------NEXT TURN STARTS BELOW----------");
-    if (forfeitBool) {
-        // by the time we get to this if statement, we've already checked whether or not booly is true
-        // again, booly returns true if AT LEAST one direction (from click point) would lead to a legal move
-        // so at this point, if for 
-        turn *= -1;
-        return;
-    }
-    if (forfeitBool && (zeroCount == 0)) {
-        getWinner(blackChipCount, whiteChipCount);
-        // still need to handle the case where BOTH players focus
-        // how about making 2 global vars; p1FFstatus, p2FFstatus; initialize both to false
-        // then in these if statements here, if forfeit is true, set that global var to true
-        // also need to handle the case if black/whiteChipCount are equal to each other
-
-        // consider wrapping handleClick() in another function that runs checkForfeit first
-        // ask Daniel: would it have been a good idea to make tools? that would allow us to test very specific cases? (e.g. allowing me to put down as many white/black chips as i can and then testing whether forfeit() will work)
-        // ANSWER: Daniel said yes, it should be doable
-
-        // when you pass in an event as an argument in a callback, can you pass that same event into ANOTHER function INSIDE the cb? 
-        // should be possible since js is loosely typed?
-    }
 
     console.log("calling render() from handleClick()");
     render();
@@ -894,16 +858,13 @@ function checkAll(colIdx, rowIdx, boolKey) {
 
 function getWinner(blackChips, whiteChips) {
     if (blackChips === whiteChips) {
-
+        alert("the game is tied");
     } else {
-
+        winner = (blackChips > whiteChips) ? 1 : -1;
+        winBanner.style.visibility = "visible";
+        winBanner.style.color = `${PLAYERS[winner * -1]}`;
+        winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
     }
-    winner = (blackChips > whiteChips) ? 1 : -1;
-    winBanner.style.visibility = "visible";
-    winBanner.style.color = `${PLAYERS[winner * -1]}`;
-    winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
-    return winner;
-    // FUCK. winner is a bool
 }
 
 function handleClick(evt) {
@@ -920,7 +881,6 @@ function handleClick(evt) {
     } 
     handleClickDo(evt);
     // if neither of the if statements above are triggered, then we run handleClickDo as usual
-
     // when refactoring, we can consider creating a Player CLASS; so each player can keep track of their own forfeit status
 }
 
@@ -944,5 +904,23 @@ function checkForfeit() {
             }
         });
     });
+
+    blackChipCount = 0;
+    whiteChipCount = 0;
+    // nested forEach()s to sum up all the white and black ships that are currently in the board app state
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            if (content === 1) {
+                ++blackChipCount;
+                p1Score.textContent = `${blackChipCount}`;
+            } else if (content === -1) {
+                ++whiteChipCount;
+                p2Score.textContent = `${whiteChipCount}`;
+            } else {
+                zeroCount++;
+            }
+        });
+    });
+
     return forfeit;
 }
