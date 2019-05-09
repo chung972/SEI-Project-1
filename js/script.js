@@ -18,6 +18,7 @@ const p1Score = document.getElementById("p1Score");
 const p2Score = document.getElementById("p2Score");
 const p1Turn = document.querySelector("#colL p.status");
 const p2Turn = document.querySelector("#colR p.status");
+const winBanner = document.getElementById("banner");
 
 /*----- event listeners -----*/
 document.getElementById("board").addEventListener('click', handleClick);
@@ -45,7 +46,7 @@ init(); // call the init function so the game starts upon loading
 // CHECK functions below
 function checkUp(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     // console.log(`the value of the tile ABOVE (c[${colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
     // rowIdx--; // compensating for console.log above; 
     // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
@@ -76,7 +77,7 @@ function checkUp(colIdx, rowIdx) {
 
 function checkDown(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
     // console.log(`the value of the tile BELOW (c[${colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
     // //note how after we PREfix (--rowIdx), we can just call board[cIdx][rIdx] and we get the correct value of turn
     // rowIdx++; // compensating for console.log above; 
@@ -117,7 +118,7 @@ function checkDown(colIdx, rowIdx) {
 
 function checkLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
 
     // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     // colIdx++;
@@ -154,7 +155,7 @@ function checkLeft(colIdx, rowIdx) {
 
 function checkRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx} w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
 
     // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     // colIdx--;
@@ -190,7 +191,7 @@ function checkRight(colIdx, rowIdx) {
 
 function checkTopLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
 
     // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     // colIdx++;
@@ -228,7 +229,7 @@ function checkTopLeft(colIdx, rowIdx) {
 
 function checkTopRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
 
     // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     // colIdx--;
@@ -266,7 +267,7 @@ function checkTopRight(colIdx, rowIdx) {
 
 function checkBotLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
 
     // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
     // colIdx++;
@@ -304,7 +305,7 @@ function checkBotLeft(colIdx, rowIdx) {
 
 function checkBotRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}];  CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
 
     // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
     // colIdx--;
@@ -714,8 +715,6 @@ function render() {
 }
 
 function handleClick(evt) {
-    let blackChipCount = 0;
-    let whiteChipCount = 0;
     const tile = evt.target;
     // create a function scoped constant on the element that fired the event
     const colIdx = parseInt(tile.id.charAt(1));
@@ -723,15 +722,33 @@ function handleClick(evt) {
     // because of the naming convention for the id's of each div html element
     // representing a space on the board (c'col#'r'row#'), we can specifically
     // target them with hardcoded indices; note that this is NOT ROBUST
-    if (isNaN(colIdx)) return; // handles cases where users click inbetween divs
+    if (isNaN(colIdx)) return; 
+    // handles cases where users click inbetween divs
     if ((board[colIdx][rowIdx]) || winner) return;
     // handles cases where there is an existing value in a tile or if winner is found
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
+    let blackChipCount = 0;
+    let whiteChipCount = 0;
     let zeroCount = 0;
     let booly = false;
+
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            if (content === 1) {
+                ++blackChipCount;
+                p1Score.textContent = `${blackChipCount}`;
+            } else if (content === -1) {
+                ++whiteChipCount;
+                p2Score.textContent = `${whiteChipCount}`;
+            } else {
+                zeroCount++;
+            }
+        });
+    });
+
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
 
     // first checks to make sure a move is legal (i.e. you are not clicking right next to a blank tile or
@@ -817,40 +834,35 @@ function handleClick(evt) {
         console.log(`turn just changed to: ${turn}`)
     }
 
-    // TODO worry about changing the border to dashed and hover/mouseEnter logic
-
-    console.log("calling render() from handleClick()");
-
-    board.forEach(function (colArr, colIdx) {
-        colArr.forEach(function (content, rowIdx) {
-            if (content === 1) {
-                ++blackChipCount;
-                p1Score.textContent = `${blackChipCount}`;
-            } else if (content === -1) {
-                ++whiteChipCount;
-                p2Score.textContent = `${whiteChipCount}`;
-            } else {
-                zeroCount++;
-            }
-        });
-    });
     let forfeitBool = null;
-    if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY limit to start invoking checkForfeit()
+    if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
     console.log(`forfeit returned: ${forfeitBool}; zeroCount is: ${zeroCount}`);
-    // will need to flesh out win logic after this
     console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
     console.log("----------NEXT TURN STARTS BELOW----------");
-    if (forfeitBool || (zeroCount == 0)) {
-        getWinner(blackChipCount, whiteChipCount);
+    if (forfeitBool) {
+        turn *= -1;
+        return;
     }
-
+    if (forfeitBool && (zeroCount == 0)) {
+        getWinner(blackChipCount, whiteChipCount);
+        // still need to handle the case where BOTH players focus
+        // how about making 2 global vars; p1FFstatus, p2FFstatus; initialize both to false
+        // then in these if statements here, if forfeit is true, set that global var to true
+        
+        // consider wrapping handleClick() in another function that runs checkForfeit first
+    }
+    
+    console.log("calling render() from handleClick()");
     render();
     // calls render() to have the front-end reflect the newly updated app state
 }
 
 function getWinner(blackChips, whiteChips) {
     winner = (blackChips > whiteChips) ? 1 : -1;
-    alert(`Player ${(winner === 1) ? 1 : 2} wins!!!`);
+    // alert(`Player ${(winner === 1) ? 1 : 2} wins!!!`);
+    winBanner.style.visibility = "visible";
+    winBanner.style.color = `${PLAYERS[winner*-1]}`;
+    winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
     return winner;
 }
 
