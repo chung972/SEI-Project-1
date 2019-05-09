@@ -11,6 +11,10 @@
 - CSS
 - HTML
 ---
+### Difficulties:
+- Attempted to create a temporaryBoard variable that would keep track of *potential* conversions/captures and then set board to tempBoard if a move is deemed legal. However, the issue with this approach is that we would lose the object reference to the original board variable.
+- Discovered that when in/decrementing a value written in a template literal, said value will **remain** in/decremented; had to appropriately "compensate" each template literal console.log that mutated a value. 
+---
 ### Getting Started:
 Link to deployed [game](https://pages.git.generalassemb.ly/chung972/SEI-Project-1/).
 
@@ -19,10 +23,11 @@ The Rules:
 2. To make a **LEGAL** move, you **MUST** capture an enemy piece (will also be referred to as chip)
 3. To **CAPTURE** an enemy piece, you must place your **OWN** chip between an **ENEMY** chip and **ANOTHER** of your own chips;\
 this can be done in any direction: N, NE, E, SE, S, SW, W, NW;\
+a single placement can also capture in multiple directions concurrently;\
 capturing an enemy chip will **CONVERT** that piece to the captor's color
 4. As long as you are **UNABLE** to make a **LEGAL MOVE** (i.e. capture an enemy chip), your turn will be **FORFEITED**
 5. If **BOTH** players are unable to make a legal move, then the game ends
-6. If there are no more empty tiles, the game also ends
+6. If there are no empty tiles, the game also ends
 7. The winner is determined by whichever player has the most chips at the end of the game
 ---
 ### Next Steps:
