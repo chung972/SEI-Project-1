@@ -3,7 +3,7 @@ Othello
 Background Information:
 
 Screenshots:
-
+![](images/OthelloSS.png)
 
 Technologies Used:
     - JavaScript
