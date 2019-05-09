@@ -60,7 +60,6 @@ section div {
     
 }
 section div:hover{
-    border-style: dashed;
     cursor: pointer;
 }
 
@@ -80,10 +79,16 @@ footer {
     background-color: rgb(204, 204, 204);
 }
 
+#boardBackground{
+    grid-area: game;
+    background-color: rgb(204, 204, 204);
+}
 #board{
     grid-area: game;
     justify-content: center;
-    
+    padding: auto;
+    border: 15px solid rgb(75, 30, 4);
+    border-radius: 12px;
 }
 
 button{

@@ -7,18 +7,10 @@ const PLAYERS = {
 
 /*----- app's state (variables) -----*/
 var board, winner, turn;
-
-var globalCol = null;
-var globalRow = null;
-
-
-
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
-
-
-
-
+var globalCol = null;
+var globalRow = null;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
@@ -35,6 +27,11 @@ document.querySelector("button").addEventListener('click', init);
 // added a listener for our reset button; calls init on press; very elegant solution;
 // idea taken from tictactoe code-along w/Daniel
 
+// document.querySelector(".tile").addEventListener('mouseenter', handleEnter);
+// document.querySelector(".tile").addEventListener('mouseleave', handleLeave);
+
+
+
 
 
 // TODO maybe create a button or some other element that will popup (alert) user with 
@@ -43,6 +40,7 @@ document.querySelector("button").addEventListener('click', init);
 
 /*----- functions -----*/
 init(); // call the init function so the game starts upon loading
+
 
 // CHECK functions below
 function checkUp(colIdx, rowIdx) {
@@ -664,8 +662,30 @@ function init() {
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     resetGlobalIdx();
+
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            const div = document.getElementById(`c${colIdx}r${rowIdx}`);
+            div.addEventListener('mouseenter', handleEnter);    // is there a way to pass in content here? more generally pass in arguments to a callback?
+            div.addEventListener('mouseleave', handleLeave);
+        });
+    });
+    // because mouseENTER/LEAVE doesn't bubble, we have to addEventListners to each div
+    // can read more here: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event
+
     render();   // call render to have the front-end reflect app state
 }
+
+function handleEnter(evt){
+    const div = evt.target;
+    div.style.border = `5px solid ${PLAYERS[turn]}`;
+}
+
+function handleLeave(evt){
+    const div = evt.target;
+    div.style.border = `5px solid gray`;
+}
+
 
 function render() {
     // since our board is a nested array, we use nested forEach iterators
@@ -689,8 +709,8 @@ function render() {
             // refer to const PLAYERS objecgt above for more
         });
     });
-    (turn === 1) ? p1Turn.style.borderColor="white" : p1Turn.style.borderColor="black";
-    (turn === -1) ? p2Turn.style.borderColor="black" : p2Turn.style.borderColor="white";
+    (turn === 1) ? p1Turn.style.borderColor = "white" : p1Turn.style.borderColor = "black";
+    (turn === -1) ? p2Turn.style.borderColor = "black" : p2Turn.style.borderColor = "white";
 }
 
 function handleClick(evt) {
@@ -800,7 +820,7 @@ function handleClick(evt) {
     // TODO worry about changing the border to dashed and hover/mouseEnter logic
 
     console.log("calling render() from handleClick()");
-    
+
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             if (content === 1) {
@@ -815,12 +835,12 @@ function handleClick(evt) {
         });
     });
     let forfeitBool = null;
-    if(zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY limit to start invoking checkForfeit()
+    if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY limit to start invoking checkForfeit()
     console.log(`forfeit returned: ${forfeitBool}; zeroCount is: ${zeroCount}`);
     // will need to flesh out win logic after this
     console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
     console.log("----------NEXT TURN STARTS BELOW----------");
-    if(forfeitBool || (zeroCount==0)) {
+    if (forfeitBool || (zeroCount == 0)) {
         getWinner(blackChipCount, whiteChipCount);
     }
 
@@ -828,7 +848,7 @@ function handleClick(evt) {
     // calls render() to have the front-end reflect the newly updated app state
 }
 
-function getWinner(blackChips, whiteChips){
+function getWinner(blackChips, whiteChips) {
     winner = (blackChips > whiteChips) ? 1 : -1;
     alert(`Player ${(winner === 1) ? 1 : 2} wins!!!`);
     return winner;
