@@ -11,6 +11,8 @@ var board, winner, turn;
 // not there's a winner, and which player's turn it is; see methods below for more
 var globalCol = null;
 var globalRow = null;
+var blackChipCount = 0;
+var whiteChipCount = 0;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
@@ -663,6 +665,8 @@ function init() {
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     resetGlobalIdx();
+    blackChipCount = 0;
+    whiteChipCount = 0;
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
@@ -730,8 +734,6 @@ function handleClick(evt) {
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
-    let blackChipCount = 0;
-    let whiteChipCount = 0;
     let zeroCount = 0;
     let booly = false;
 
@@ -807,6 +809,8 @@ function handleClick(evt) {
         }
     }
 
+    blackChipCount = 0;
+    whiteChipCount = 0;
     // nested forEach()s to sum up all the white and black ships that are currently in the board app state
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
