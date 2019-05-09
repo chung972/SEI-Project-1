@@ -49,30 +49,19 @@ init(); // call the init function so the game starts upon loading
 function checkUp(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
-    // console.log(`the value of the tile ABOVE (c[${colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // rowIdx--; // compensating for console.log above; 
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
-
     if (board[colIdx][++rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkDownLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkDownLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkDownLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return; 
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkUp(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        checkUp(colIdx, rowIdx);    
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -80,29 +69,18 @@ function checkUp(colIdx, rowIdx) {
 function checkDown(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
-    // console.log(`the value of the tile BELOW (c[${colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // //note how after we PREfix (--rowIdx), we can just call board[cIdx][rIdx] and we get the correct value of turn
-    // rowIdx++; // compensating for console.log above; 
-    // // just as a rule of thumb, make sure to compensate after inc/decrementing in a template literal
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}`);
-
     if (board[colIdx][--rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkUpLegal(colIdx, rowIdx);
         if (bool1) {
-            // because we decremented in the if statement above, don't need to dec again
-            let tempArr = [colIdx, rowIdx];
-            // console.log(`checkUpLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);
-            // HEY. This is chekcUP!!!, NOT checkDOWN
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkUpLegal returned ${bool1}`);
             return;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
-        // console.log("in else if; you are about to recurse");
+        checkDown(colIdx, rowIdx);
         // since that first IF didn't return true, we skip that block, then we go to the next, HOWEVER, since we DID run
         // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
         // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
@@ -110,9 +88,7 @@ function checkDown(colIdx, rowIdx) {
         // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
         // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
         // set the tempBoard at this nested index to hold the converted tile value 
-        checkDown(colIdx, rowIdx);
     } else {
-        // console.log("do nothing");
         return;
     }
 
@@ -121,36 +97,21 @@ function checkDown(colIdx, rowIdx) {
 function checkLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return;
     colIdx++;
-
-    // console.log(`the value of the tile LEFT (c[${--colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // colIdx++; // compensating for console.log above; 
-    // console.log(`value of colIdx w/compensation: ${colIdx}`);
-
     if (board[--colIdx][rowIdx] === turn) {
-        // console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkRightLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkRightLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkRightLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return; 
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkLeft(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) {
+        checkLeft(colIdx, rowIdx);  
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -158,35 +119,21 @@ function checkLeft(colIdx, rowIdx) {
 function checkRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx} w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
-
-    // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return;
     colIdx--;
-
-    // console.log(`the value of the tile LEFT (c[${++colIdx}]r[${rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // colIdx--;
-    // console.log(`value of colIdx w/compensation: ${colIdx}`);
-
     if (board[++colIdx][rowIdx] === turn) {
-        // console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
+        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkLeftLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx];
-            // console.log(`checkLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkLeftLegal returned ${bool1}`);
             return;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
-        // console.log("in else if; you are about to recurse");
-        checkRight(colIdx, rowIdx);    // RECURSION OVER HERE
+        checkRight(colIdx, rowIdx);  
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -194,37 +141,21 @@ function checkRight(colIdx, rowIdx) {
 function checkTopLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return;
     colIdx++;
-
-    // console.log(`the value of the tile ABOVE and LEFT (c[${--colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // rowIdx--; // compensating for console.log above; 
-    // colIdx++;
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
-
     if (board[--colIdx][++rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkBotRightLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkBotRightLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkBotRightLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return;  
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkTopLeft(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        checkTopLeft(colIdx, rowIdx);    
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -232,37 +163,21 @@ function checkTopLeft(colIdx, rowIdx) {
 function checkTopRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
-
-    // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return false;
     colIdx--;
-
-    // console.log(`the value of the tile ABOVE and RIGHT (c[${++colIdx}]r[${++rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // rowIdx--; // compensating for console.log above; 
-    // colIdx--;
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
-
     if (board[++colIdx][++rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkBotLeftLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkBotLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkBotLeftLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return;   
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkTopRight(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        checkTopRight(colIdx, rowIdx);   
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -270,37 +185,21 @@ function checkTopRight(colIdx, rowIdx) {
 function checkBotLeft(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return;
     colIdx++;
-
-    // console.log(`the value of the tile BELOW and RIGHT (c[${--colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);        // error thrown here
-    // rowIdx++;
-    // colIdx++;
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
-
     if (board[--colIdx][--rowIdx] === turn) {
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkTopRightLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkTopRightLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkTopRightLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return;   
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkBotLeft(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        checkBotLeft(colIdx, rowIdx);    
     } else {
-        // console.log("do nothing");
         return;
     }
 }
@@ -308,273 +207,148 @@ function checkBotLeft(colIdx, rowIdx) {
 function checkBotRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
-
-    // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return;
     colIdx--;
 
-    // console.log(`the value of the tile BELOW and RIGHT (c[${++colIdx}]r[${--rowIdx}])is: ${board[colIdx][rowIdx]}`);
-    // rowIdx++;
-    // colIdx--;
-    // console.log(`value of rowIdx w/compensation: ${rowIdx}; value of colIdx w/comp ${colIdx}`);
-
     if (board[++colIdx][--rowIdx] === turn) {
-        // console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkTopLeftLegal(colIdx, rowIdx);
         if (bool1) {
-            let tempArr = [colIdx, rowIdx]; // TRACK DOWN ARR
-            // console.log(`checkTopLeftLegal returned ${bool1}; (tempArr) is: ${tempArr}; tempArr[0]: ${tempArr[0]} is a typeof ${typeof tempArr[0]}`);    // HEY. This is checkDOWN!!!, NOT checkUP
-            // return tempArr;   // if checkDown is TRUE, then return the current values of col/rowIdx
             globalCol = colIdx;
             globalRow = rowIdx;
-            console.log(`globalCol has been set to ${globalCol}, globalRow has been set to ${globalRow}`);
+            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
         } else {
-            // console.log(`checkTopLeftLegal returned ${bool1}`);
-            return;   // if checkDown returns FALSE, do nothing; just return
+            return;  
         }
-    } else if (board[colIdx][rowIdx] === (turn * -1)) { // again, don't need to inc rowIdx because you already did in the first if
-        // console.log("in else if; you are about to recurse");
-        checkBotRight(colIdx, rowIdx);    // RECURSION OVER HERE
-
+    } else if (board[colIdx][rowIdx] === (turn * -1)) { 
+        checkBotRight(colIdx, rowIdx);    
     } else {
-        // console.log("do nothing");
         return;
     }
 }
 
 
 // check LEGAL functions below
-function checkUpLegal(colIdx, rowIdx) { // checks tile/chip DIRECTLY ABOVE clicked tile 
-    // console.log("-------------------------------------------");
-    // console.log("In checkUpLegal()");
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx--; // compensating for console.log above; 
+function checkUpLegal(colIdx, rowIdx) {
 
     let bool1 = ++rowIdx < board[colIdx].length; // catches cases where the rowIdx checked is higher than the ceiling (index 7);
     // NOTE: the cases where clicking on row 7 is legal will be caught by the checkDownLegal function
-    // console.log(`bool1: ++rowIdx (${rowIdx}) < board[${colIdx}].length (${board[colIdx].length}): ${bool1}`);
     rowIdx--;
 
     let bool2 = board[colIdx][++rowIdx] === (turn * -1);
     // checks that the chip ABOVE you belongs to the opponent; i.e. should have a DIFFERENT turn value in order to be true
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
-    rowIdx--; //compensating for console.log above;
+    rowIdx--; 
 
     let bool3 = board[colIdx][++rowIdx] !== 0; // catches cases where the tile DIRECTLY ABOVE (the clicked tile) is blank
     // NOTE: the cases where there is a blank tile directly above will be caught by the checkDownLegal function
     // also, don't have to worry about dec'ing this ++rowIdx because this is the last boolean that uses it for logic
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
     // so long as the value of turn for the tile ABOVE you is NOT the same AND is NOT 0, AND is within the bounds
 }
 
 function checkDownLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log("In checkDownLegal()");
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx++; // compensating for console.log above; 
 
     let bool1 = --rowIdx > -1;  // catches cases where the rowIdx you are checking is out of bounds (i.e. undefined)
     // also, because there are only 8 (0-7)rows, we won't have to worry about a player clicking on row 9 (index 8)
     // NOTE: the cases where clicking on row 0 is legal will be caught by the checkUpLegal function
-    // console.log(`bool1: --rowIdx (${rowIdx}) > -1: ${bool1}`);
     rowIdx++;
 
     let bool2 = board[colIdx][--rowIdx] === (turn * -1);
-    // checks that the chip BELOW you belongs to the opponent; i.e.  should have a DIFFERENT turn value in order to be true
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
-    rowIdx++; //compensating for console.log above;
+    // checks that the chip BELOW you belongs to the opponent; i.e. should have a DIFFERENT turn value in order to be true
+    rowIdx++; 
 
-    let bool3 = board[colIdx][--rowIdx] !== 0;  // catches cases where the tile DIRECTLY BELOW (the clicked tile) is blank
-    // NOTE: the cases where there is a blank tile directly below will be caught by the checkUpLegal function
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
+    let bool3 = board[colIdx][--rowIdx] !== 0; 
     return bool1 && bool2 && bool3;
 }
 
 function checkLeftLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log("In checkLeftLegal()");
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return false;
     colIdx++;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${--colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // colIdx++;
-
     let bool1 = --colIdx > -1;
-    // console.log(`bool1: --colIdx (${colIdx}) > -1: ${bool1}`);
     colIdx++;
 
     let bool2 = board[--colIdx][rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     colIdx++;
 
     let bool3 = board[--colIdx][rowIdx] !== 0;
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
 function checkRightLegal(colIdx, rowIdx) {
-
-    // console.log("-------------------------------------------");
-    // console.log("In checkRightLegal()");
-
-    // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}): ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return false;
     colIdx--;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${++colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // colIdx--;
-
     let bool1 = ++colIdx < board.length;
-    // console.log(`bool1: ++colIdx (${colIdx}) < board.length (${board.length}): ${bool1}`);
     colIdx--;
 
     let bool2 = board[++colIdx][rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     colIdx--;
 
     let bool3 = board[++colIdx][rowIdx] !== 0;
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
 function checkTopLeftLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log("In checkTopLeftLegal()");
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return false;
     colIdx++;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${--colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx--;
-    // colIdx++;
-
     let bool1 = (++rowIdx < board[colIdx].length) && (--colIdx > -1);
-    // console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length ${bool1}) AND (--colIdx (${colIdx}) > -1): ${bool1}`);
     rowIdx--;
     colIdx++;
 
     let bool2 = board[--colIdx][++rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     rowIdx--;
     colIdx++;
 
     let bool3 = board[--colIdx][++rowIdx] !== 0;
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
 function checkTopRightLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log("In checkTopRightLegal()");
-
-    // console.log(`++colIdx (${colIdx++}) === board.length (${board.length}): ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return false;
     colIdx--;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${++colIdx}][${++rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx--;
-    // colIdx--;
-
-    //              top if condition                   right if condition
     let bool1 = (++rowIdx < board[colIdx].length) && (++colIdx < board.length);
-    // console.log(`bool1: (++rowIdx (${rowIdx}) < board[${colIdx}].length: ${bool1}) AND (++colIdx (${colIdx}) < board.length (${board.length}): ${bool1})`);
     rowIdx--;
     colIdx--;
 
     let bool2 = board[++colIdx][++rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     rowIdx--;
     colIdx--;
 
     let bool3 = board[++colIdx][++rowIdx] !== 0;
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
 function checkBotLeftLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log("In checkBotLeftLegal()");
-
-    // console.log(`--colIdx (${--colIdx}) < 0: ${colIdx < 0}`)
-    // colIdx++;
     if (--colIdx < 0) return false;
     colIdx++;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${--colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx++;
-    // colIdx++;
-
     let bool1 = (--rowIdx > -1) && (--colIdx > -1);
-    // console.log(`bool1: (--rowIdx (${rowIdx}) > -1: ${bool1}) AND (--colIdx (${colIdx}) > -1): ${bool1}`);
     rowIdx++;
     colIdx++;
 
     let bool2 = board[--colIdx][--rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
     rowIdx++;
     colIdx++;
 
     let bool3 = board[--colIdx][--rowIdx] !== 0;
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
 function checkBotRightLegal(colIdx, rowIdx) {
-    // console.log("-------------------------------------------");
-    // console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}]; CURRENT turn value is: ${turn}`);
-
-    // console.log(`++colIdx (${++colIdx}) === board.length (${board.length}) is: ${colIdx === board.length}`);
-    // colIdx--;
     if (++colIdx === board.length) return false;
     colIdx--;
 
-    // console.log(`passed in - board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // console.log(`checking - board[${++colIdx}][${--rowIdx}]: ${board[colIdx][rowIdx]}`);
-    // rowIdx++; // compensating for console.log above; 
-    // colIdx--;
-
     let bool1 = (--rowIdx > -1) && (++colIdx < board.length);
-    // console.log(`bool1: (--rowIdx (${rowIdx}) > -1: ${bool1}) AND (++colIdx (${colIdx}) < board.length (${board.length}): ${bool1})`);
     rowIdx++;
     colIdx--;
 
     let bool2 = board[++colIdx][--rowIdx] === (turn * -1);
-    // console.log(`bool2: turn (board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]}) === (turn (${turn}) * -1): ${bool2}`);
-    rowIdx++; //compensating for console.log above;
+    rowIdx++; 
     colIdx--;
 
     let bool3 = board[++colIdx][--rowIdx] !== 0;
-
-    // console.log(`bool3: board[${colIdx}][${rowIdx}] (${board[colIdx][rowIdx]})!== 0: ${bool3}`);
-    // console.log("-------------------------------------------");
     return bool1 && bool2 && bool3;
 }
 
@@ -582,7 +356,6 @@ function checkBotRightLegal(colIdx, rowIdx) {
 function resetGlobalIdx() {
     globalCol = null;
     globalRow = null;
-    // console.log(`globals reset; gCol: ${globalCol}, gRow: ${globalRow}`);
 }
 
 function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
@@ -735,6 +508,7 @@ function handleClick(evt) {
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
     let forfeitStatus = checkForfeit();
+    console.log(`forfeitStatus ${forfeitStatus}`);
 
     let zeroCount = 0;
     let booly = false;
