@@ -1,6 +1,7 @@
 # Othello
 ---
 ### Background Information:
+*Othello* (also known as *Reversi*) is a classic board game that employs abstract strategy. The origins of *Othello* are unclear, but its most recent history is traced back to Lewis Waterman and John W. Mollett who popularized the game some time in the 1880's. Since then, a Japanese salesman by the name of Goro Hasegawa patented a modern rule-set in 1971; this version is still used today and remains the standard for international tournaments. Half of this modernization was initializing the board with 4 pieces (2 from each player) in a diagonal pattern; the other was shedding the old name of *Reversi* and adopting *Othello* instead.
 ---
 ### Screenshots:
 ![Othello Screenshot](images/OthelloSS.png)
@@ -13,7 +14,7 @@
 ### Getting Started:
 Link to deployed [game](https://pages.git.generalassemb.ly/chung972/SEI-Project-1/).
 
-The Rules:\
+The Rules:
 1. Black has the first move
 2. To make a **LEGAL** move, you **MUST** capture an enemy piece (will also be referred to as chip)
 3. To **CAPTURE** an enemy piece, you must place your **OWN** chip between an **ENEMY** chip and **ANOTHER** of your own chips;\
@@ -27,3 +28,4 @@ capturing an enemy chip will **CONVERT** that piece to the captor's color
 ### Next Steps:
 - [ ] Create and append elements representing captured chips that will dynamically grow/shrink based on the app state
 - [ ] Squash edge case bugs (where conversions occur when they should and shouldn't)
+- [ ] Incorporate Responsive Web Design

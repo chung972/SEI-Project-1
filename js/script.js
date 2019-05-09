@@ -854,6 +854,7 @@ function handleClick(evt) {
         // then in these if statements here, if forfeit is true, set that global var to true
 
         // consider wrapping handleClick() in another function that runs checkForfeit first
+        // ask Daniel: would it have been a good idea to make tools? that would allow us to test very specific cases? (e.g. allowing me to put down as many white/black chips as i can and then testing whether forfeit() will work)
     }
     
     console.log("calling render() from handleClick()");
