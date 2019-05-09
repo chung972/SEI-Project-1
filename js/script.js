@@ -30,17 +30,6 @@ document.querySelector("button").addEventListener('click', init);
 // added a listener for our reset button; calls init on press; very elegant solution;
 // idea taken from tictactoe code-along w/Daniel
 
-// document.querySelector(".tile").addEventListener('mouseenter', handleEnter);
-// document.querySelector(".tile").addEventListener('mouseleave', handleLeave);
-
-
-
-
-
-// TODO maybe create a button or some other element that will popup (alert) user with 
-//      instructions? great idea taken from Yolie
-
-
 /*----- functions -----*/
 init(); // call the init function so the game starts upon loading
 
@@ -209,7 +198,6 @@ function checkBotRight(colIdx, rowIdx) {
     console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (++colIdx === board.length) return;
     colIdx--;
-
     if (board[++colIdx][--rowIdx] === turn) {
         let bool1 = checkTopLeftLegal(colIdx, rowIdx);
         if (bool1) {
@@ -369,15 +357,12 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
 
     console.log("-------------------------------------------");
     console.log("In CONVERSION");
-    // console.log(`Math.abs(srcColIdx(${sourceColIdx})-trgtColIdx(${targetColIdx}) ) is: ${Math.abs(sourceColIdx - targetColIdx)}`)
-    // the two for loops below 
     for (let i = 0; i < Math.abs(sourceColIdx - targetColIdx); i++) {
         let tempNo = sourceColIdx + (colCounter * (i + 1));
         colArr.push(tempNo);
         console.log(`colArr just pushed  ${tempNo}; colArr now holds: ${colArr}`)
     }
 
-    // console.log(`Math.abs(srcRowIdx(${sourceRowIdx})-trgtRowIdx(${targetRowIdx}) ) is: ${Math.abs(sourceRowIdx - targetRowIdx)}`)
     for (let i = 0; i < Math.abs(sourceRowIdx - targetRowIdx); i++) {
         let tempNo = sourceRowIdx + (rowCounter * (i + 1));
         rowArr.push(tempNo);
@@ -420,9 +405,6 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     // technically matter if you color over your own tile, but still; also, this method will NOT color the clicked tile
 }
 
-
-
-
 function init() {
     board = [
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -438,13 +420,13 @@ function init() {
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     resetGlobalIdx();
-    blackChipCount = 0;
-    whiteChipCount = 0;
+    blackChipCount = 2;
+    whiteChipCount = 2;
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             const div = document.getElementById(`c${colIdx}r${rowIdx}`);
-            div.addEventListener('mouseenter', handleEnter);    // is there a way to pass in content here? more generally pass in arguments to a callback?
+            div.addEventListener('mouseenter', handleEnter);  
             div.addEventListener('mouseleave', handleLeave);
         });
     });
@@ -464,7 +446,6 @@ function handleLeave(evt){
     div.style.border = `5px solid gray`;
 }
 
-
 function render() {
     // since our board is a nested array, we use nested forEach iterators
     board.forEach(function (colArr, colIdx) {
@@ -472,15 +453,7 @@ function render() {
             const div = document.getElementById(`c${colIdx}r${rowIdx}`);
             // use template literal notation to procedurely set the background
             // color of each div element that represents a tile/chip
-
-            /** FOR CSS STYLING PURPOSES
-             *      consider wrapping each div with another div, that way we can create an actual grid
-             *      have the outer/wrapper div display a border; and we won't have to worry about trying
-             *      to access the tile pieces because we have ids (that's how powerful they are)
-             */
-
             div.style.backgroundColor = PLAYERS[content];
-
             // use square bracket notation because input can vary; 
             // note that the VALUE of PLAYERS[content] will depend on
             // the KEY that is passed in (the actual 'content' arg); 
@@ -491,7 +464,14 @@ function render() {
     (turn === -1) ? p2Turn.style.borderColor = "black" : p2Turn.style.borderColor = "white";
 }
 
-function handleClick(evt) {
+function handleClick(evt){
+    let ffs = checkForfeit();
+    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
+    console.log(`ffs is: ${ffs}`);
+    handleClickDo(evt);
+}
+
+function handleClickDo(evt) {
     const tile = evt.target;
     // create a function scoped constant on the element that fired the event
     const colIdx = parseInt(tile.id.charAt(1));
@@ -507,9 +487,6 @@ function handleClick(evt) {
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
 
-    let forfeitStatus = checkForfeit();
-    console.log(`forfeitStatus ${forfeitStatus}`);
-
     let zeroCount = 0;
     let booly = false;
 
@@ -524,15 +501,17 @@ function handleClick(evt) {
     if (checkUpLegal(colIdx, rowIdx)) {
         checkUp(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // UP
-            if(forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
+            // we can only reach the inside of this nested if statment IF a direction was legal at click point
+            //
         }
     }
 
     if (checkDownLegal(colIdx, rowIdx)) {
         checkDown(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // DOWN
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -540,7 +519,7 @@ function handleClick(evt) {
     if (checkLeftLegal(colIdx, rowIdx)) {
         checkLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // LEFT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -548,7 +527,7 @@ function handleClick(evt) {
     if (checkRightLegal(colIdx, rowIdx)) {
         checkRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // RIGHT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -556,7 +535,7 @@ function handleClick(evt) {
     if (checkTopLeftLegal(colIdx, rowIdx)) {
         checkTopLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // TOP LEFT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -564,7 +543,7 @@ function handleClick(evt) {
     if (checkTopRightLegal(colIdx, rowIdx)) {
         checkTopRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // TOP RIGHT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -572,7 +551,7 @@ function handleClick(evt) {
     if (checkBotLeftLegal(colIdx, rowIdx)) {
         checkBotLeft(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // BOT LEFT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -580,7 +559,7 @@ function handleClick(evt) {
     if (checkBotRightLegal(colIdx, rowIdx)) {
         checkBotRight(colIdx, rowIdx);
         if (!(globalCol === null || globalRow === null)) {              // BOT RIGHT
-            if(!forfeitStatus) convert(colIdx, rowIdx, globalCol, globalRow);
+            convert(colIdx, rowIdx, globalCol, globalRow);
             booly = true;
         }
     }
@@ -617,7 +596,6 @@ function handleClick(evt) {
     // if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
     console.log(`forfeitStatus returned: ${forfeitStatus}; zeroCount is: ${zeroCount}`);
     console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
-    console.log("----------NEXT TURN STARTS BELOW----------");
     if (forfeitStatus) {
         turn *= -1;
         return;
@@ -627,13 +605,14 @@ function handleClick(evt) {
         // still need to handle the case where BOTH players focus
         // how about making 2 global vars; p1FFstatus, p2FFstatus; initialize both to false
         // then in these if statements here, if forfeit is true, set that global var to true
-
+        
         // consider wrapping handleClick() in another function that runs checkForfeit first
         // ask Daniel: would it have been a good idea to make tools? that would allow us to test very specific cases? (e.g. allowing me to put down as many white/black chips as i can and then testing whether forfeit() will work)
     }
     
     console.log("calling render() from handleClick()");
     render();
+    console.log("----------NEXT TURN STARTS BELOW----------");
     // calls render() to have the front-end reflect the newly updated app state
 }
 
@@ -657,6 +636,7 @@ function checkForfeit() {
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             if (content === 0) {
+
                 if (checkUpLegal(colIdx, rowIdx)) {
                     checkUp(colIdx, rowIdx);
                     if (!(globalCol === null || globalRow === null)) {              // UP
