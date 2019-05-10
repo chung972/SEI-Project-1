@@ -1,8 +1,8 @@
 /*----- constants -----*/
 const PLAYERS = {
-    "1": {"color":"black", "forfeitStatus":false},       // black moves first
-    "-1":{"color":"white", "forfeitStatus":false},
-    "0": {"color":"#065241"}      // set empty squares to color of background
+    "1": { "color": "black", "forfeitStatus": false },       // black moves first
+    "-1": { "color": "white", "forfeitStatus": false },
+    "0": { "color": "#065241" }      // set empty squares to color of background
 };
 
 /*----- app's state (variables) -----*/
@@ -24,9 +24,30 @@ const winBanner = document.getElementById("banner");
 document.getElementById("board").addEventListener('click', handleClick);
 // take advantage of event delegation; have the parent for all the div (tile) elements
 // listen for mouse clicks
-document.querySelector("button").addEventListener('click', init);
+document.getElementById("reset").addEventListener('click', init);
 // added a listener for our reset button; calls init on press; very elegant solution;
 // idea taken from tictactoe code-along w/Daniel
+
+document.getElementById("rules").addEventListener('click', function(){
+    alert(`The Rules:
+    1. Black has the first move
+    2. To make a LEGAL move, you MUST capture an enemy piece 
+        (will also be referred to as chip)
+    3. To CAPTURE an enemy piece, you must place your OWN 
+        chip between an ENEMY chip and ANOTHER of YOUR chips;
+        this can be done in any direction: N, NE, E, SE, S, SW, W, NW;
+        a single placement can also capture in multiple directions 
+        concurrently;
+        capturing an enemy chip will CONVERT that piece to the 
+        captor's color
+    4. As long as you are UNABLE to make a LEGAL MOVE (i.e. 
+        capture an enemy chip), your turn will be **FORFEITED**
+    5. If BOTH players are unable to make a legal move, then the 
+        game ends
+    6. If there are no empty tiles, the game also ends
+    7. The winner is determined by whichever player has the most 
+        chips at the end of the game`);
+});
 
 /*----- functions -----*/
 init(); // call the init function so the game starts upon loading
@@ -482,16 +503,16 @@ function render() {
 }
 
 function handleClick(evt) {
-    let ffs = checkForfeit();
     console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
+    let ffs = checkForfeit();
     console.log(`ffs is: ${ffs}`);
 
-    if(zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
-    if(ffs){
+    if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
+    if (ffs) {
         PLAYERS[turn].forfeitStatus = ffs;
         turn *= -1;
-    } 
-    if((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn*-1].forfeitStatus === true)){
+    }
+    if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
         getWinner(blackChipCount, whiteChipCount);
     }
     render();
@@ -542,7 +563,7 @@ function handleClickDo(evt) {
     console.log("----------NEXT TURN STARTS BELOW----------");
 }
 
-function countChips(){
+function countChips() {
     zeroCount = 0;
     blackChipCount = 0;
     whiteChipCount = 0;
@@ -564,6 +585,7 @@ function countChips(){
 }
 
 function checkAll(colIdx, rowIdx, key) {
+    console.log("in checkAll");
     let isLegal = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
 
@@ -641,6 +663,7 @@ function checkAll(colIdx, rowIdx, key) {
         }
     }
     console.log(`checkAll returns ${isLegal}`);
+    // console.log(`checkForfeit SHOULD return ${!isLegal}`);
     return isLegal;
 }
 
@@ -663,23 +686,27 @@ function getWinner(blackChips, whiteChips) {
 }
 
 function checkForfeit() {
+    console.log("in checkForfeit");
     let forfeitKey = false;
     let forfeit = true;
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             /**
-            * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for tiles whose content === 0;
-            * note that you can only ever place a chip on an empty tile;
-            */
-            if (content === 0) {
-                forfeit = !(checkAll(colIdx, rowIdx, forfeitKey));
+             * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for tiles whose content === 0;
+             * note that you can only ever place a chip on an empty tile;
+             */
+            if (board[colIdx][rowIdx] === 0) {
+                if (!(checkAll(colIdx, rowIdx, forfeitKey))) {
+                    forfeit = false;
+                }
                 // on each element of board, check to see if forfeit is FALSE; recall that by default, checkAll() assumes
                 // that isLegal is FALSE and seeks to find a SINGLE CASE that will assign it to TRUE; therefore, by 
                 // prefixing the return value of checkAll with a !, we can mutate that boolean for the purpose of forfeit,
                 // where we want precisely the opposite; we want assume that forfeit is TRUE and want to find a single
                 // case where it is FALSE
             }
+
         });
     });
     console.log(`checkForfeit returns: ${forfeit}`);
