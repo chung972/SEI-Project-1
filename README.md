@@ -49,3 +49,4 @@ capturing an enemy chip will **CONVERT** that piece to the captor's color
 - [ ] Create and append elements representing captured chips that will dynamically grow/shrink based on the app state
 - [ ] Squash edge case bugs (where conversions occur when they should and shouldn't)
 - [ ] Incorporate Responsive Web Design
+- [ ] Refactor code; specifically, try and consolidate all the directions into an object, so that each direction will hold its own functions for checking through recursively and for checking whether it is legal to move in a certain direction to begin with

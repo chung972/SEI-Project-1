@@ -57,11 +57,8 @@ init(); // call the init function so the game starts upon loading
 // FUNCTIONS ARE TRIMMED DOWN
 
 function checkUp(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (board[colIdx][++rowIdx] === turn) {
         // check if tile DIRECTLY ABOVE the nested index that was passed in has the SAME TURN VALUE as the current global turn variable
-        console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkDownLegal(colIdx, rowIdx);
         // if true, then proceed to check if that this is a legal move; note how we are calling checkDOWNLegal here and NOT checkUP;
         // the reasoning for this becomes clear when you consider that this function will recursively call upon itself UNTIL it finds
@@ -95,8 +92,6 @@ function checkUp(colIdx, rowIdx) {
 }
 
 function checkDown(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKDOWN: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
     if ((board[colIdx][--rowIdx] === turn) && (checkUpLegal(colIdx, rowIdx))) {
         setGlobals(colIdx, rowIdx);    
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
@@ -105,8 +100,6 @@ function checkDown(colIdx, rowIdx) {
 }
 
 function checkLeft(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
     if (--colIdx < 0) return;
     colIdx++;
     if ((board[--colIdx][rowIdx] === turn) && (checkRightLegal(colIdx, rowIdx))) {
@@ -117,8 +110,6 @@ function checkLeft(colIdx, rowIdx) {
 }
 
 function checkRight(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx} w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
     if (++colIdx === board.length) return;
     colIdx--;
     if ((board[++colIdx][rowIdx] === turn) && (checkLeftLegal(colIdx, rowIdx))) {
@@ -129,8 +120,6 @@ function checkRight(colIdx, rowIdx) {
 }
 
 function checkTopLeft(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKTOPLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (--colIdx < 0) return;
     colIdx++;
     if ((board[--colIdx][++rowIdx] === turn) && (checkBotRightLegal(colIdx, rowIdx))) {
@@ -141,8 +130,6 @@ function checkTopLeft(colIdx, rowIdx) {
 }
 
 function checkTopRight(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKTOPRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (++colIdx === board.length) return false;
     colIdx--;
     if ((board[++colIdx][++rowIdx] === turn) && (checkBotLeftLegal(colIdx, rowIdx))) {
@@ -153,8 +140,6 @@ function checkTopRight(colIdx, rowIdx) {
 }
 
 function checkBotLeft(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (--colIdx < 0) return;
     colIdx++;
     if ((board[--colIdx][--rowIdx] === turn) && (checkTopRightLegal(colIdx, rowIdx))) {
@@ -165,8 +150,6 @@ function checkBotLeft(colIdx, rowIdx) {
 }
 
 function checkBotRight(colIdx, rowIdx) {
-    console.log("-------------------------------------------");
-    console.log(`IN CHECKBOTRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (++colIdx === board.length) return;
     colIdx--;
     if ((board[++colIdx][--rowIdx] === turn) && (checkTopLeftLegal(colIdx, rowIdx))) {
@@ -288,17 +271,11 @@ function checkBotRightLegal(colIdx, rowIdx) {
     return withinBounds && nextChipIsEnemy && nextChipNotZero;
 }
 
-
 function resetGlobalIdx() {
     globalCol = null;
     globalRow = null;
     console.log("globals reset!");
 }
-
-/**
- * the globalCol/RowIdx values are getting overwritten with weird data in edge cases. BECAUSE forEachs will iterate through
- * no matter what, 
- */
 
 function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;       // CATCH CASE OF 0
@@ -308,54 +285,39 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     // a negative)
     let colArr = [];
     let rowArr = [];
-
-    console.log("-------------------------------------------");
-    console.log("In CONVERSION");
     for (let i = 0; i < Math.abs(sourceColIdx - targetColIdx); i++) {
         let tempNo = sourceColIdx + (colCounter * (i + 1));
         colArr.push(tempNo);
-        console.log(`colArr just pushed  ${tempNo}; colArr now holds: ${colArr}`)
     }
-
     for (let i = 0; i < Math.abs(sourceRowIdx - targetRowIdx); i++) {
         let tempNo = sourceRowIdx + (rowCounter * (i + 1));
         rowArr.push(tempNo);
-        console.log(`rowArr just pushed  ${tempNo}; rowArr now holds: ${rowArr}`)
     }
-    console.log("-------------------------------------------");
-
     // you won't ever have a case where col and row "steps" (think about the diagonal cases) are off by more than one. 
     if (colArr.length === 0) {  // catches cases where only the ROW changes; set the colIdx to be source
-        console.log("colArr.length === 0");
         let limit = rowArr.length;
         for (let i = 0; i < limit; i++) {
             let holder = rowArr.pop();
             board[sourceColIdx][holder] = turn;
-            console.log(`board[${sourceColIdx}][${holder}] now holds: ${turn}`);
         }
         resetGlobalIdx();
         // we reset the globalCol/RowIdx variables so that they do not retain anything after convert() is invoked
     } else if (rowArr.length === 0) {   // catches cases where only the COLUMN changes; set the rowIdx to source
-        console.log("rowArr.length === 0");
         let limit = colArr.length;
         for (let i = 0; i < limit; i++) {
             let holder = colArr.pop();
             board[holder][sourceRowIdx] = turn;
-            console.log(`board[${holder}][${sourceRowIdx}] now holds: ${turn}`)
         }
         resetGlobalIdx();
     } else {
-        console.log("rowArr.length !== 0 and colArr.length !== 0");
         let limit = colArr.length;
         for (let i = 0; i < limit; i++) {
             let holder1 = colArr.pop();
             let holder2 = rowArr.pop();
             board[holder1][holder2] = turn;
-            console.log(`board[${holder1}][${holder2}] now holds: ${turn}`);
         }
         resetGlobalIdx();
     }
-    console.log("-------------------------------------------");
 }
 
 function init() {
@@ -423,7 +385,6 @@ function handleClick(evt) {
     console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
     let ffs = checkForfeit();
     console.log(`ffs is: ${ffs}`);
-
     if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
     if (ffs) {
         console.log(`ffs is true to reach this console.log.`)
@@ -436,7 +397,6 @@ function handleClick(evt) {
     if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
         getWinner(blackChipCount, whiteChipCount);
     }
-    render();
     handleClickDo(evt);
 }
 
@@ -453,10 +413,7 @@ function handleClickDo(evt) {
     if (!!(board[colIdx][rowIdx]) || !!(winner)) return;
     // handles cases where there is an existing value in a tile or if winner is truthy
     // line inspired by tictactoe code along w/Daniel
-
-    console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
     let convertKey = true;
-
     let booly = checkAll(colIdx, rowIdx, convertKey);
     // checkAll returns true ONLY if AT LEAST one direction (from the click point) is deemed a LEGAL MOVE;
     // see checkAll() for more info
@@ -464,17 +421,14 @@ function handleClickDo(evt) {
         board[colIdx][rowIdx] = turn;
         // assigning the board location to the current turn INSIDE of this if statement makes sure that
         // a player is unable to place his/her chip on an ILLEGAL tile
-        console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
         turn *= -1;
         // necessarily need this here (inside the if), because so long as the player is unable to click, 
         // it is STILL that player's turn hands the turn back over to the other player; 
         // look at init() for initial turn value
     }
     countChips();
-    console.log("calling render() from handleClick()");
     render();
     // calls render() to have the front-end reflect the newly updated app state
-    console.log("----------NEXT TURN STARTS BELOW----------");
 }
 
 function countChips() {
@@ -499,10 +453,8 @@ function countChips() {
 }
 
 function checkAll(colIdx, rowIdx, key) {
-    console.log("in checkAll");
     let isLegal = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
-
     /**
      * by default, ASSUME that you all directions from the click point (whose col/row indices are passed in)
      * are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we
@@ -593,7 +545,6 @@ function checkAll(colIdx, rowIdx, key) {
     return isLegal;
 }
 
-
 function getWinner(blackChips, whiteChips) {
     if (blackChips === whiteChips) {
         // if the number of black and white chips are the SAME, then change css to display "tie game" 
@@ -615,7 +566,6 @@ function checkForfeit() {
     console.log("in checkForfeit");
     let forfeitKey = false;
     let forfeit = true;
-
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             /**
@@ -632,7 +582,6 @@ function checkForfeit() {
                 // where we want precisely the opposite; we want assume that forfeit is TRUE and want to find a single
                 // case where it is FALSE
             }
-
         });
     });
     console.log(`checkForfeit returns: ${forfeit}`);
