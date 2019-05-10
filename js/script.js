@@ -165,10 +165,10 @@ function checkUp(colIdx, rowIdx) {
 
 function checkDown(colIdx, rowIdx) {
     if ((board[colIdx][--rowIdx] === turn) && (checkUpLegal(colIdx, rowIdx))) {
-        setGlobals(colIdx, rowIdx);    
+        setGlobals(colIdx, rowIdx);
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         checkDown(colIdx, rowIdx);
-    } 
+    }
 }
 
 function checkLeft(colIdx, rowIdx) {
@@ -381,7 +381,6 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
 }
 
 function handleClick(evt) {
-    console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
     let ffs = checkForfeit();
     console.log(`ffs is: ${ffs}`);
     if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
@@ -407,15 +406,15 @@ function handleClickDo(evt) {
     // because of the naming convention for the id's of each div html element
     // representing a space on the board (c'col#'r'row#'), we can specifically
     // target them with hardcoded indices; note that this is NOT ROBUST
+    let convertKey = true;
+    let booly = checkAll(colIdx, rowIdx, convertKey);
+    // checkAll returns true ONLY if AT LEAST one direction (from the click point) is deemed a LEGAL MOVE;
+    // see checkAll() for more info
     if (isNaN(colIdx)) return;
     // handles cases where users click inbetween divs
     if (!!(board[colIdx][rowIdx]) || !!(winner)) return;
     // handles cases where there is an existing value in a tile or if winner is truthy
     // line inspired by tictactoe code along w/Daniel
-    let convertKey = true;
-    let booly = checkAll(colIdx, rowIdx, convertKey);
-    // checkAll returns true ONLY if AT LEAST one direction (from the click point) is deemed a LEGAL MOVE;
-    // see checkAll() for more info
     if (booly) {
         board[colIdx][rowIdx] = turn;
         // assigning the board location to the current turn INSIDE of this if statement makes sure that
@@ -454,12 +453,9 @@ function countChips() {
 function checkAll(colIdx, rowIdx, key) {
     let isLegal = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
-    /**
-     * by default, ASSUME that you all directions from the click point (whose col/row indices are passed in)
-     * are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we
-     * can change isLegal to be true. you only need to access the inside of ONE nested if statement to turn 
-     * isLegal true.
-     */
+    //by default, ASSUME that you all directions from the click point (whose col/row indices are passed in) 
+    //are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we can 
+    //change isLegal to be true. you only need to access the inside of ONE nested if statement to turn isLegal true.
 
     // first checks to make sure a move is legal (i.e. you are not clicking right next to a blank tile or
     // your own chip); IF that condition is met, then proceed to check through that direction; IF the move
@@ -476,6 +472,11 @@ function checkAll(colIdx, rowIdx, key) {
             isLegal = true;
             // we can only reach the inside of this nested if statment IF a direction is legal at the location
             // passed in by the parameters
+            // also, note the if(key) statement. we pass in a boolean as the third parameter for checkAll()
+            // checkAll() is only ever invoked in two methods, checkForfeit() and handleClickDo(); in the case of
+            // the former, we ONLY to be checking whether a move would be legal (we DON'T want to make any
+            // conversions if a move IS legal); however, the case of the latter, we DO want to convert tiles
+            // if our conditions are met
         }
         resetGlobalIdx();
         // it is CRITICAL that we call resetGlobalIdx() within the FIRST of the three nested if statements;
@@ -540,7 +541,6 @@ function checkAll(colIdx, rowIdx, key) {
         resetGlobalIdx();
     }
     console.log(`checkAll: at least one direction is ${isLegal}`);
-    // console.log(`checkForfeit SHOULD return ${!isLegal}`);
     return isLegal;
 }
 
@@ -562,7 +562,6 @@ function getWinner(blackChips, whiteChips) {
 }
 
 function checkForfeit() {
-    console.log("in checkForfeit");
     let forfeitKey = false;
     let forfeit = true;
     board.forEach(function (colArr, colIdx) {
@@ -571,16 +570,12 @@ function checkForfeit() {
              * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for tiles whose content === 0;
              * note that you can only ever place a chip on an empty tile;
              */
-            if (board[colIdx][rowIdx] === 0) {
-                if (!(checkAll(colIdx, rowIdx, forfeitKey))) {
-                    forfeit = false;
-                }
-                // on each element of board, check to see if forfeit is FALSE; recall that by default, checkAll() assumes
-                // that isLegal is FALSE and seeks to find a SINGLE CASE that will assign it to TRUE; therefore, by 
-                // prefixing the return value of checkAll with a !, we can mutate that boolean for the purpose of forfeit,
-                // where we want precisely the opposite; we want assume that forfeit is TRUE and want to find a single
-                // case where it is FALSE
-            }
+            if ((board[colIdx][rowIdx] === 0) && !(checkAll(colIdx, rowIdx, forfeitKey))) forfeit = false;
+            // on each element of board, check to see if forfeit is FALSE; recall that by default, checkAll() assumes
+            // that isLegal is FALSE and seeks to find a SINGLE CASE that will assign it to TRUE; therefore, by 
+            // prefixing the return value of checkAll with a !, we can mutate that boolean for the purpose of forfeit,
+            // where we want precisely the opposite; we want assume that forfeit is TRUE and want to find a single
+            // case where it is FALSE
         });
     });
     console.log(`checkForfeit returns: ${forfeit}`);
