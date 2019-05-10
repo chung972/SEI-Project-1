@@ -74,9 +74,7 @@ function checkUp(colIdx, rowIdx) {
         if (bool1) {
             //if the tile below DOES meet this condition (along with a few others; go to checkDown() for more info), then we will assign
             // the globalCol/Row variables to hold the board location; these values are critical for the convert() function
-            globalCol = colIdx;
-            globalRow = rowIdx;
-            console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
+            setGlobals(colIdx, rowIdx);
             return;
         } else {
             // if the tile below does NOT pass checkDownLegal(), we simply break out of the function
@@ -219,7 +217,7 @@ function checkDownLegal(colIdx, rowIdx) {
 function checkLeftLegal(colIdx, rowIdx) {
     // for all functions that check Left, we add this if statement below to immediately catch if
     // the colIdx is out of bounds; if we do not break out of the function and then attempt to
-    // call on said out of bounds index, an error will be thrown
+    // call on said out of bounds index, an error will be thrown  
     if (--colIdx < 0) return false;
     colIdx++;
     let bool1 = --colIdx > -1;
@@ -299,7 +297,13 @@ function checkBotRightLegal(colIdx, rowIdx) {
 function resetGlobalIdx() {
     globalCol = null;
     globalRow = null;
+    console.log("globals reset!");
 }
+
+/**
+ * the globalCol/RowIdx values are getting overwritten with weird data in edge cases. BECAUSE forEachs will iterate through
+ * no matter what, 
+ */
 
 function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;       // CATCH CASE OF 0
@@ -428,6 +432,7 @@ function handleClick(evt) {
         console.log(`ffs is true to reach this console.log.`)
         PLAYERS[turn].forfeitStatus = ffs;
         turn *= -1;
+        return;
     } else {
         PLAYERS[turn].forfeitStatus = ffs;
     }
@@ -448,7 +453,7 @@ function handleClickDo(evt) {
     // target them with hardcoded indices; note that this is NOT ROBUST
     if (isNaN(colIdx)) return;
     // handles cases where users click inbetween divs
-    if ((board[colIdx][rowIdx]) || !!(winner)) return;
+    if (!!(board[colIdx][rowIdx]) || !!(winner)) return;
     // handles cases where there is an existing value in a tile or if winner is truthy
     // line inspired by tictactoe code along w/Daniel
 
@@ -467,15 +472,8 @@ function handleClickDo(evt) {
         // necessarily need this here (inside the if), because so long as the player is unable to click, 
         // it is STILL that player's turn hands the turn back over to the other player; 
         // look at init() for initial turn value
-        console.log(`turn just changed to: ${turn}`)
     }
     countChips();
-
-    // nested forEach()s to sum up all the white and black chips that are currently in the board app state
-    // we tally up the chip counts for black/white/zero AFTER the invoking checkAll(); this is to ensure
-    // that we correctly consider the updated board app state
-
-
     console.log("calling render() from handleClick()");
     render();
     // calls render() to have the front-end reflect the newly updated app state
@@ -531,6 +529,7 @@ function checkAll(colIdx, rowIdx, key) {
             // we can only reach the inside of this nested if statment IF a direction is legal at the location
             // passed in by the parameters
         }
+        resetGlobalIdx();
     }
     if (checkDownLegal(colIdx, rowIdx)) {
         checkDown(colIdx, rowIdx);
@@ -538,6 +537,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkLeftLegal(colIdx, rowIdx)) {
         checkLeft(colIdx, rowIdx);
@@ -545,6 +545,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkRightLegal(colIdx, rowIdx)) {
         checkRight(colIdx, rowIdx);
@@ -552,6 +553,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkTopLeftLegal(colIdx, rowIdx)) {
         checkTopLeft(colIdx, rowIdx);
@@ -559,6 +561,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkTopRightLegal(colIdx, rowIdx)) {
         checkTopRight(colIdx, rowIdx);
@@ -566,6 +569,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkBotLeftLegal(colIdx, rowIdx)) {
         checkBotLeft(colIdx, rowIdx);
@@ -573,6 +577,7 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
     if (checkBotRightLegal(colIdx, rowIdx)) {
         checkBotRight(colIdx, rowIdx);
@@ -580,8 +585,9 @@ function checkAll(colIdx, rowIdx, key) {
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
             isLegal = true;
         }
+        resetGlobalIdx();
     }
-    console.log(`checkAll returns ${isLegal}`);
+    console.log(`checkAll: at least one direction is ${isLegal}`);
     // console.log(`checkForfeit SHOULD return ${!isLegal}`);
     return isLegal;
 }
