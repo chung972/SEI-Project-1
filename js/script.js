@@ -128,6 +128,9 @@ function resetGlobalIdx() {
 }
 
 // check functions below
+
+// NOTE: checkUP is INTENTIONALLY VERBOSE so that readers can step through the thought process behind each line
+//       the other checkDirection functions are trimmed down
 function checkUp(colIdx, rowIdx) {
     if (board[colIdx][++rowIdx] === turn) {
         // check if tile DIRECTLY ABOVE the nested index that was passed in has the SAME TURN VALUE as the current global turn variable
@@ -383,20 +386,27 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
 
 function handleClick(evt) {
     let ffs = checkForfeit();
-    console.log(`ffs is: ${ffs}`);
-    if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
+
     if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
         getWinner(blackChipCount, whiteChipCount);
+        // if there are still empty tiles, then check the forfeitStatus property of each player;
+        // if they are BOTH set to true, then end the game
     }
     if (ffs) {
-        console.log(`ffs is true to reach this console.log.`)
         PLAYERS[turn].forfeitStatus = ffs;
+        // set the player's forfeitStatus to ffs; if it's true, this if statement is accessed, and
         turn *= -1;
         return;
+        // the turn is handed to the other player
     } else {
         PLAYERS[turn].forfeitStatus = ffs;
+        // otherwise, set the forfeitStatus to ffs anyway; this IS important, because w/o this else
+        // statement, we'd have no way to change a player's forfeitStatus back to false, causing that
+        // player to indefinitely forfeit their turn
     }
     handleClickDo(evt);
+    if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
+    // check if there are any empty tiles left; if there aren't, end the game (i.e. run getWinner())
 }
 
 function handleClickDo(evt) {
@@ -542,7 +552,6 @@ function checkAll(colIdx, rowIdx, key) {
         }
         resetGlobalIdx();
     }
-    console.log(`checkAll: at least one direction is ${isLegal}`);
     return isLegal;
 }
 
