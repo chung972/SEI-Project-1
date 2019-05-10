@@ -56,6 +56,78 @@ init(); // call the init function so the game starts upon loading
 // NOTE THAT CHECKUP() IS INTENTIONALLY KEPT VERBOSE SO THAT READERS CAN FOLLOW THE THOUGHT PROCESS; ALL OTHER CHECK
 // FUNCTIONS ARE TRIMMED DOWN
 
+function init() {
+    board = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, -1, 0, 0, 0],      // the 4 indices in the center are
+        [0, 0, 0, -1, 1, 0, 0, 0],      // the starting positions every game
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+    ];
+
+    winner = false;  // set winner to false at the beginning of the game
+    turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
+    globalCol = null;
+    globalRow = null;
+    resetGlobalIdx();
+    winBanner.style.visibility = "hidden";
+    countChips();
+
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            const div = document.getElementById(`c${colIdx}r${rowIdx}`);
+            div.addEventListener('mouseenter', handleEnter);
+            div.addEventListener('mouseleave', handleLeave);
+        });
+    });
+    // because mouseENTER/LEAVE doesn't bubble, we have to addEventListners to each div
+    // can read more here: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event
+
+    render();   // call render to have the front-end reflect app state
+}
+
+function handleEnter(evt) {
+    const div = evt.target;
+    div.style.border = `5px solid ${PLAYERS[turn].color}`;
+}
+
+function handleLeave(evt) {
+    const div = evt.target;
+    div.style.border = `5px solid gray`;
+}
+
+function render() {
+    // since our board is a nested array, we use nested forEach iterators
+    board.forEach(function (colArr, colIdx) {
+        colArr.forEach(function (content, rowIdx) {
+            const div = document.getElementById(`c${colIdx}r${rowIdx}`);
+            // use template literal notation to procedurely set the background
+            // color of each div element that represents a tile/chip
+            div.style.backgroundColor = PLAYERS[content].color;
+            // use square bracket notation because input can vary; 
+            // note that the VALUE of PLAYERS[content] will depend on
+            // the KEY that is passed in (the actual 'content' arg); 
+            // refer to const PLAYERS objecgt above for more
+        });
+    });
+    (turn === 1) ? p1Turn.style.borderColor = "white" : p1Turn.style.borderColor = "black";
+    (turn === -1) ? p2Turn.style.borderColor = "black" : p2Turn.style.borderColor = "white";
+}
+
+function setGlobals(colIdx, rowIdx) {
+    globalCol = colIdx;
+    globalRow = rowIdx;
+}
+
+function resetGlobalIdx() {
+    globalCol = null;
+    globalRow = null;
+}
+
+// check functions below
 function checkUp(colIdx, rowIdx) {
     if (board[colIdx][++rowIdx] === turn) {
         // check if tile DIRECTLY ABOVE the nested index that was passed in has the SAME TURN VALUE as the current global turn variable
@@ -157,12 +229,6 @@ function checkBotRight(colIdx, rowIdx) {
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         checkBotRight(colIdx, rowIdx);
     }
-}
-
-function setGlobals(colIdx, rowIdx) {
-    globalCol = colIdx;
-    globalRow = rowIdx;
-    console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
 }
 
 // check LEGAL functions below
@@ -271,12 +337,6 @@ function checkBotRightLegal(colIdx, rowIdx) {
     return withinBounds && nextChipIsEnemy && nextChipNotZero;
 }
 
-function resetGlobalIdx() {
-    globalCol = null;
-    globalRow = null;
-    console.log("globals reset!");
-}
-
 function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     let colCounter = (Math.sign(sourceColIdx - targetColIdx) === 1) ? -1 : 1;       // CATCH CASE OF 0
     let rowCounter = (Math.sign(sourceRowIdx - targetRowIdx) === 1) ? -1 : 1;
@@ -320,72 +380,14 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
     }
 }
 
-function init() {
-    board = [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, -1, 0, 0, 0],      // the 4 indices in the center are
-        [0, 0, 0, -1, 1, 0, 0, 0],      // the starting positions every game
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-    ];
-
-    winner = false;  // set winner to false at the beginning of the game
-    turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
-    globalCol = null;
-    globalRow = null;
-    resetGlobalIdx();
-    winBanner.style.visibility = "hidden";
-    countChips();
-
-    board.forEach(function (colArr, colIdx) {
-        colArr.forEach(function (content, rowIdx) {
-            const div = document.getElementById(`c${colIdx}r${rowIdx}`);
-            div.addEventListener('mouseenter', handleEnter);
-            div.addEventListener('mouseleave', handleLeave);
-        });
-    });
-    // because mouseENTER/LEAVE doesn't bubble, we have to addEventListners to each div
-    // can read more here: https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event
-
-    render();   // call render to have the front-end reflect app state
-}
-
-function handleEnter(evt) {
-    const div = evt.target;
-    div.style.border = `5px solid ${PLAYERS[turn].color}`;
-}
-
-function handleLeave(evt) {
-    const div = evt.target;
-    div.style.border = `5px solid gray`;
-}
-
-function render() {
-    // since our board is a nested array, we use nested forEach iterators
-    board.forEach(function (colArr, colIdx) {
-        colArr.forEach(function (content, rowIdx) {
-            const div = document.getElementById(`c${colIdx}r${rowIdx}`);
-            // use template literal notation to procedurely set the background
-            // color of each div element that represents a tile/chip
-            div.style.backgroundColor = PLAYERS[content].color;
-            // use square bracket notation because input can vary; 
-            // note that the VALUE of PLAYERS[content] will depend on
-            // the KEY that is passed in (the actual 'content' arg); 
-            // refer to const PLAYERS objecgt above for more
-        });
-    });
-    (turn === 1) ? p1Turn.style.borderColor = "white" : p1Turn.style.borderColor = "black";
-    (turn === -1) ? p2Turn.style.borderColor = "black" : p2Turn.style.borderColor = "white";
-}
-
 function handleClick(evt) {
     console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
     let ffs = checkForfeit();
     console.log(`ffs is: ${ffs}`);
     if (zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
+    if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
+        getWinner(blackChipCount, whiteChipCount);
+    }
     if (ffs) {
         console.log(`ffs is true to reach this console.log.`)
         PLAYERS[turn].forfeitStatus = ffs;
@@ -393,9 +395,6 @@ function handleClick(evt) {
         return;
     } else {
         PLAYERS[turn].forfeitStatus = ffs;
-    }
-    if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
-        getWinner(blackChipCount, whiteChipCount);
     }
     handleClickDo(evt);
 }
