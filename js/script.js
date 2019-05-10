@@ -6,11 +6,9 @@ const PLAYERS = {
 };
 
 /*----- app's state (variables) -----*/
-var board, winner, turn, blackChipCount, whiteChipCount, zeroCount;
+var board, winner, turn, blackChipCount, whiteChipCount, zeroCount, globalCol, globalRow;
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
-var globalCol = null;
-var globalRow = null;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
@@ -27,7 +25,6 @@ document.getElementById("board").addEventListener('click', handleClick);
 document.getElementById("reset").addEventListener('click', init);
 // added a listener for our reset button; calls init on press; very elegant solution;
 // idea taken from tictactoe code-along w/Daniel
-
 document.getElementById("rules").addEventListener('click', function () {
     alert(`The Rules:
     1. Black has the first move
@@ -51,7 +48,6 @@ document.getElementById("rules").addEventListener('click', function () {
 
 /*----- functions -----*/
 init(); // call the init function so the game starts upon loading
-
 
 // CHECK functions below
 // all CHECK functions share similar code with the obvious caveat being the offset that each direction demands;
@@ -106,7 +102,6 @@ function checkDown(colIdx, rowIdx) {
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         checkDown(colIdx, rowIdx);
     } 
-
 }
 
 function checkLeft(colIdx, rowIdx) {
@@ -162,7 +157,7 @@ function checkBotLeft(colIdx, rowIdx) {
     console.log(`IN CHECKBOTLEFT: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (--colIdx < 0) return;
     colIdx++;
-    if ((board[--colIdx][--rowIdx] === turn) && (checkTopLeftLegal(colIdx, rowIdx))) {
+    if ((board[--colIdx][--rowIdx] === turn) && (checkTopRightLegal(colIdx, rowIdx))) {
         setGlobals(colIdx, rowIdx);
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         checkBotLeft(colIdx, rowIdx);
@@ -377,6 +372,8 @@ function init() {
 
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
+    globalCol = null;
+    globalRow = null;
     resetGlobalIdx();
     winBanner.style.visibility = "hidden";
     countChips();
@@ -530,6 +527,10 @@ function checkAll(colIdx, rowIdx, key) {
             // passed in by the parameters
         }
         resetGlobalIdx();
+        // it is CRITICAL that we call resetGlobalIdx() within the FIRST of the three nested if statements;
+        // because of the nature of forEach(), we are unable to break out of the function until EVERY element
+        // has been iterated through; therefore, if a certain direction is able to meet the condition for
+        // the THIRD if statement, then globalCol and globalRow will be 
     }
     if (checkDownLegal(colIdx, rowIdx)) {
         checkDown(colIdx, rowIdx);
