@@ -35,22 +35,37 @@ init(); // call the init function so the game starts upon loading
 
 
 // CHECK functions below
+// all CHECK functions share similar code with the obvious caveat being the offset that each direction demands;
+// e.g. checkUp will leave the colIdx alone, but will INCREMENT the rowIdx value
 function checkUp(colIdx, rowIdx) {
     console.log("-------------------------------------------");
     console.log(`IN CHECKUP: CURRENT tile is: board[${colIdx}][${rowIdx}] w/ value of ${board[colIdx][rowIdx]};  CURRENT turn value is: ${turn}`);
     if (board[colIdx][++rowIdx] === turn) {
+        // check if tile DIRECTLY ABOVE the nested index that was passed in has the SAME TURN VALUE as the current global turn variable
         console.log(`in if; value of board[${colIdx}][${rowIdx}]: ${board[colIdx][rowIdx]}, value of turn is: ${turn}`);
         let bool1 = checkDownLegal(colIdx, rowIdx);
+        // if true, then proceed to check if that this is a legal move; note how we are calling checkDOWNLegal here and NOT checkUP;
+        // the reasoning for this becomes clear when you consider that this function will recursively call upon itself UNTIL it finds
+        // that the tile above shares the same turn value as the global turn variable; once this condition is met, we checkDOWN to make
+        // sure that the tile directly BELOW holds a DIFFERENT turn value
         if (bool1) {
+            //if the tile below DOES meet this condition (along with a few others; go to checkDown() for more info), then we will assign
+            // the globalCol/Row variables to hold the board location; these values are critical for the convert() function
             globalCol = colIdx;
             globalRow = rowIdx;
             console.log(`globalCol is now: ${globalCol}, globalRow is now: ${globalRow}`);
+            return;
         } else {
+            // if the tile below does NOT pass checkDownLegal(), we simply break out of the function
             return;
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
+        // if we find that the tile directly above holds a turn value different from the global turn variable, then we recursively call on
+        // checkUp, passing in board location of the tile above; note how we do not have to mutate rowIdx, since we PREFIXED it(i.e. ++rowIdx);
+        // recall that PREFIXING will return a new value, in this case rowIdx + 1; as opposed to rowIdx++ which would return the original rowIdx value
         checkUp(colIdx, rowIdx);
     } else {
+        // this last else statement catches the case where the above tile is empty or out of bounds; if such is the case, simply break out 
         return;
     }
 }
@@ -70,13 +85,13 @@ function checkDown(colIdx, rowIdx) {
         }
     } else if (board[colIdx][rowIdx] === (turn * -1)) {
         checkDown(colIdx, rowIdx);
-        // since that first IF didn't return true, we skip that block, then we go to the next, HOWEVER, since we DID run
-        // the if statement, the value of rowIdx will remain decremented; that's why we don't have to dec it again here
+        // since that first IF didn't return true, we skip that block, which brings us to this else if, HOWEVER, since we DID run
+        // the if statement, the value of rowIdx will remain decremented; that's why we don't have to decrement it again here;
         // also, we don't have to worry about running into the same inc/dec issue with turn because we haven't re-assigned it
         // to anything (which would require an '=')
-        // by the fact that we're at this line of code means that the (else) if condition above is true; therefore, the
-        // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent); now we
-        // set the tempBoard at this nested index to hold the converted tile value 
+        // by the fact that we're at this line of code means that the else if condition above is true; therefore, the
+        // turn value of the CURRENT tile is the opposite of the turn (i.e. this tile belongs to the opponent) and we are safe
+        // to recursively call on checkDown();
     } else {
         return;
     }
@@ -249,6 +264,9 @@ function checkDownLegal(colIdx, rowIdx) {
 }
 
 function checkLeftLegal(colIdx, rowIdx) {
+    // for all functions that check Left, we add this if statement below to immediately catch if
+    // the colIdx is out of bounds; if we do not break out of the function and then attempt to
+    // call on said out of bounds index, an error will be thrown
     if (--colIdx < 0) return false;
     colIdx++;
 
@@ -263,6 +281,8 @@ function checkLeftLegal(colIdx, rowIdx) {
 }
 
 function checkRightLegal(colIdx, rowIdx) {
+    // similar to the Left checking functions, all Right checking functions also have an if condition
+    // that will immediately return and break out of the function if the colIdx is out of bounds
     if (++colIdx === board.length) return false;
     colIdx--;
 
@@ -380,6 +400,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
             console.log(`board[${sourceColIdx}][${holder}] now holds: ${turn}`);
         }
         resetGlobalIdx();
+        // we reset the globalCol/RowIdx variables so that they do not retain anything after convert() is invoked
     } else if (rowArr.length === 0) {   // catches cases where only the COLUMN changes; set the rowIdx to source
         console.log("rowArr.length === 0");
         let limit = colArr.length;
@@ -401,8 +422,6 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
         resetGlobalIdx();
     }
     console.log("-------------------------------------------");
-    // just have to make sure that the coordinates you feed in to convert() stop BEFORE your own tile (i guess it wouldn't)
-    // technically matter if you color over your own tile, but still; also, this method will NOT color the clicked tile
 }
 
 function init() {
@@ -486,10 +505,26 @@ function handleClickDo(evt) {
     // (i.e. winner === true); line taken from tictactoe code along w/Daniel
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
+    let convertKey = true;
     let zeroCount = 0;
     blackChipCount = 0;
     whiteChipCount = 0;
     // nested forEach()s to sum up all the white and black ships that are currently in the board app state
+
+
+    let booly = checkAll(colIdx,rowIdx, convertKey);
+    if (booly) {
+        board[colIdx][rowIdx] = turn;
+        // assigning the nested index to the CURRENT TURN inside of this if statement makes sure that
+        // a player is unable to place his/her chip on an ILLEGAL tile
+        console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
+        turn *= -1;
+        // necessarily need this here (inside the if), because so long as the player is unable to click, 
+        // it is STILL that player's turn hands the turn back over to the other player; 
+        // look at init() for initial turn value
+        console.log(`turn just changed to: ${turn}`)
+    }
+
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             if (content === 1) {
@@ -503,18 +538,6 @@ function handleClickDo(evt) {
             }
         });
     });
-
-    if (booly) {
-        board[colIdx][rowIdx] = turn;
-        // assigning the nested index to the CURRENT TURN inside of this if statement makes sure that
-        // a player is unable to place his/her chip on an ILLEGAL tile
-        console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
-        turn *= -1;
-        // necessarily need this here (inside the if), because so long as the player is unable to click, 
-        // it is STILL that player's turn hands the turn back over to the other player; 
-        // look at init() for initial turn value
-        console.log(`turn just changed to: ${turn}`)
-    }
 
     // if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
     console.log(`forfeitStatus returned: ${forfeitStatus}; zeroCount is: ${zeroCount}`);
@@ -603,6 +626,7 @@ function checkAll(colIdx, rowIdx, key) {
             booly = true;
         }
     }
+    console.log(`checkAll returns ${booly}`);
     return booly;
 }
 
@@ -632,6 +656,7 @@ function checkForfeit() {
             }
         });
     });
+    console.log(`checkForfeit returns: ${forfeit}`);
     return forfeit;
 }
 /**
