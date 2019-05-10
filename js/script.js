@@ -113,6 +113,10 @@ function render() {
             // refer to const PLAYERS objecgt above for more
         });
     });
+    changeTurnBorder();
+}
+
+function changeTurnBorder(){
     (turn === 1) ? p1Turn.style.borderColor = "white" : p1Turn.style.borderColor = "black";
     (turn === -1) ? p2Turn.style.borderColor = "black" : p2Turn.style.borderColor = "white";
 }
@@ -385,6 +389,7 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
 }
 
 function handleClick(evt) {
+    if((winner === 1)||(winner === -1)) return;
     let ffs = checkForfeit();
 
     if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
@@ -396,6 +401,7 @@ function handleClick(evt) {
         PLAYERS[turn].forfeitStatus = ffs;
         // set the player's forfeitStatus to ffs; if it's true, this if statement is accessed, and
         turn *= -1;
+        render();
         return;
         // the turn is handed to the other player
     } else {
