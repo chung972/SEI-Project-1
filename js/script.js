@@ -391,15 +391,14 @@ function convert(sourceColIdx, sourceRowIdx, targetColIdx, targetRowIdx) {
 function handleClick(evt) {
     if((winner === 1)||(winner === -1)) return;
     let ffs = checkForfeit();
-
-    if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
-        getWinner(blackChipCount, whiteChipCount);
-        // if there are still empty tiles, then check the forfeitStatus property of each player;
-        // if they are BOTH set to true, then end the game
-    }
     if (ffs) {
         PLAYERS[turn].forfeitStatus = ffs;
-        // set the player's forfeitStatus to ffs; if it's true, this if statement is accessed, and
+        // set the player's forfeitStatus to ffs; if it's true, this if statement is accessed
+        if ((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn * -1].forfeitStatus === true)) {
+            getWinner(blackChipCount, whiteChipCount);
+            // if there are still empty tiles, then check the forfeitStatus property of each player;
+            // if they are BOTH set to true, then end the game
+        }
         turn *= -1;
         render();
         return;
