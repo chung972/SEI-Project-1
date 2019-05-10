@@ -1,18 +1,16 @@
 /*----- constants -----*/
 const PLAYERS = {
-    "1": "black",       // black moves first
-    "-1": "white",
-    "0": "#065241"      // set empty squares to color of background
+    "1": {"color":"black", "forfeitStatus":false},       // black moves first
+    "-1":{"color":"white", "forfeitStatus":false},
+    "0": {"color":"#065241"}      // set empty squares to color of background
 };
 
 /*----- app's state (variables) -----*/
-var board, winner, turn;
+var board, winner, turn, blackChipCount, whiteChipCount, zeroCount;
 // we always want to have a handle on our game board (array), whether or
 // not there's a winner, and which player's turn it is; see methods below for more
 var globalCol = null;
 var globalRow = null;
-var blackChipCount = 0;
-var whiteChipCount = 0;
 
 /*----- cached element references -----*/
 // this'll be where we want to reference a html element to reflect a player's score/current number of chips
@@ -122,7 +120,7 @@ function checkLeft(colIdx, rowIdx) {
 
 function checkRight(colIdx, rowIdx) {
     console.log("-------------------------------------------");
-    console.log(`IN CHECKLEFT: CURRENT tile is: board[${colIdx}][${rowIdx} w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
+    console.log(`IN CHECKRIGHT: CURRENT tile is: board[${colIdx}][${rowIdx} w/ value of ${board[colIdx][rowIdx]}; CURRENT turn value is: ${turn}`);
     if (++colIdx === board.length) return;
     colIdx--;
     if (board[++colIdx][rowIdx] === turn) {
@@ -439,8 +437,8 @@ function init() {
     winner = false;  // set winner to false at the beginning of the game
     turn = 1;   // black moves first, so turn is set to 1; look at PLAYERS{} for more info
     resetGlobalIdx();
-    blackChipCount = 2;
-    whiteChipCount = 2;
+    winBanner.style.visibility = "hidden";
+    countChips();
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
@@ -457,7 +455,7 @@ function init() {
 
 function handleEnter(evt) {
     const div = evt.target;
-    div.style.border = `5px solid ${PLAYERS[turn]}`;
+    div.style.border = `5px solid ${PLAYERS[turn].color}`;
 }
 
 function handleLeave(evt) {
@@ -472,7 +470,7 @@ function render() {
             const div = document.getElementById(`c${colIdx}r${rowIdx}`);
             // use template literal notation to procedurely set the background
             // color of each div element that represents a tile/chip
-            div.style.backgroundColor = PLAYERS[content];
+            div.style.backgroundColor = PLAYERS[content].color;
             // use square bracket notation because input can vary; 
             // note that the VALUE of PLAYERS[content] will depend on
             // the KEY that is passed in (the actual 'content' arg); 
@@ -487,6 +485,16 @@ function handleClick(evt) {
     let ffs = checkForfeit();
     console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
     console.log(`ffs is: ${ffs}`);
+
+    if(zeroCount === 0) getWinner(blackChipCount, whiteChipCount);
+    if(ffs){
+        PLAYERS[turn].forfeitStatus = ffs;
+        turn *= -1;
+    } 
+    if((PLAYERS[turn].forfeitStatus === true) && (PLAYERS[turn*-1].forfeitStatus === true)){
+        getWinner(blackChipCount, whiteChipCount);
+    }
+    render();
     handleClickDo(evt);
 }
 
@@ -500,22 +508,19 @@ function handleClickDo(evt) {
     // target them with hardcoded indices; note that this is NOT ROBUST
     if (isNaN(colIdx)) return;
     // handles cases where users click inbetween divs
-    if ((board[colIdx][rowIdx]) || winner) return;
-    // handles cases where there is an existing value in a tile or if winner is found
-    // (i.e. winner === true); line taken from tictactoe code along w/Daniel
+    if ((board[colIdx][rowIdx]) || !!(winner)) return;
+    // handles cases where there is an existing value in a tile or if winner is truthy
+    // line inspired by tictactoe code along w/Daniel
 
     console.log(`CLICKED ON board[${colIdx}][${rowIdx}]`);
     let convertKey = true;
-    let zeroCount = 0;
-    blackChipCount = 0;
-    whiteChipCount = 0;
-    // nested forEach()s to sum up all the white and black ships that are currently in the board app state
 
-
-    let booly = checkAll(colIdx,rowIdx, convertKey);
+    let booly = checkAll(colIdx, rowIdx, convertKey);
+    // checkAll returns true ONLY if AT LEAST one direction (from the click point) is deemed a LEGAL MOVE;
+    // see checkAll() for more info
     if (booly) {
         board[colIdx][rowIdx] = turn;
-        // assigning the nested index to the CURRENT TURN inside of this if statement makes sure that
+        // assigning the board location to the current turn INSIDE of this if statement makes sure that
         // a player is unable to place his/her chip on an ILLEGAL tile
         console.log(`board[${colIdx}][${rowIdx}]'s value (turn) is now: ${turn}`)
         turn *= -1;
@@ -524,7 +529,25 @@ function handleClickDo(evt) {
         // look at init() for initial turn value
         console.log(`turn just changed to: ${turn}`)
     }
+    countChips();
 
+    // nested forEach()s to sum up all the white and black chips that are currently in the board app state
+    // we tally up the chip counts for black/white/zero AFTER the invoking checkAll(); this is to ensure
+    // that we correctly consider the updated board app state
+
+
+    console.log("calling render() from handleClick()");
+    render();
+    // calls render() to have the front-end reflect the newly updated app state
+    console.log("----------NEXT TURN STARTS BELOW----------");
+}
+
+function countChips(){
+    zeroCount = 0;
+    blackChipCount = 0;
+    whiteChipCount = 0;
+    // because of how dynamic the chip counts can be for either color, we reset them BOTH to 0 before counting
+    // them; this is to ensure that we do not count more chips than are present on the board
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
             if (content === 1) {
@@ -534,31 +557,22 @@ function handleClickDo(evt) {
                 ++whiteChipCount;
                 p2Score.textContent = `${whiteChipCount}`;
             } else {
-                zeroCount++;
+                ++zeroCount;
             }
         });
     });
-
-    // if (zeroCount < 32) forfeitBool = checkForfeit();    // we are HARD CODING an ARBITRARY LIMIT to start invoking checkForfeit()
-    console.log(`forfeitStatus returned: ${forfeitStatus}; zeroCount is: ${zeroCount}`);
-    console.log(`checking forfeit status of Player ${(turn === 1) ? 1 : 2}'s turn; CURRENT turn is ${turn}`);
-    if (forfeitStatus) {
-        turn *= -1;
-        return;
-    }
-    if (forfeitStatus && (zeroCount == 0)) {
-        getWinner(blackChipCount, whiteChipCount);
-    }
-
-    console.log("calling render() from handleClick()");
-    render();
-    console.log("----------NEXT TURN STARTS BELOW----------");
-    // calls render() to have the front-end reflect the newly updated app state
 }
 
 function checkAll(colIdx, rowIdx, key) {
-    let booly = false;
+    let isLegal = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
+
+    /**
+     * by default, ASSUME that you all directions from the click point (whose col/row indices are passed in)
+     * are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we
+     * can change isLegal to be true. you only need to access the inside of ONE nested if statement to turn 
+     * isLegal true.
+     */
 
     // first checks to make sure a move is legal (i.e. you are not clicking right next to a blank tile or
     // your own chip); IF that condition is met, then proceed to check through that direction; IF the move
@@ -572,7 +586,7 @@ function checkAll(colIdx, rowIdx, key) {
         checkUp(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // UP
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
             // we can only reach the inside of this nested if statment IF a direction is legal at the location
             // passed in by the parameters
         }
@@ -581,67 +595,70 @@ function checkAll(colIdx, rowIdx, key) {
         checkDown(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // DOWN
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkLeftLegal(colIdx, rowIdx)) {
         checkLeft(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // LEFT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkRightLegal(colIdx, rowIdx)) {
         checkRight(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // RIGHT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkTopLeftLegal(colIdx, rowIdx)) {
         checkTopLeft(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // TOP LEFT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkTopRightLegal(colIdx, rowIdx)) {
         checkTopRight(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // TOP RIGHT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkBotLeftLegal(colIdx, rowIdx)) {
         checkBotLeft(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // BOT LEFT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
     if (checkBotRightLegal(colIdx, rowIdx)) {
         checkBotRight(colIdx, rowIdx);
         if (globalCol !== null && globalRow !== null) {              // BOT RIGHT
             if (key) convert(colIdx, rowIdx, globalCol, globalRow);
-            booly = true;
+            isLegal = true;
         }
     }
-    console.log(`checkAll returns ${booly}`);
-    return booly;
+    console.log(`checkAll returns ${isLegal}`);
+    return isLegal;
 }
 
 
 function getWinner(blackChips, whiteChips) {
     if (blackChips === whiteChips) {
+        // if the number of black and white chips are the SAME, then change css to display "tie game" 
         winBanner.style.visibility = "visible";
         winBanner.textContent = "TIE GAME";
         winBanner.style.color = "#065241";
         winBanner.style.backgroundColor = "rgb(204, 204, 204)";
     } else {
+        // otherwise, use square bracket notation (which is super awesome and cool) to take in a variable value
+        // and display the colors of whichever player won
         winner = (blackChips > whiteChips) ? 1 : -1;
         winBanner.style.visibility = "visible";
-        winBanner.style.color = `${PLAYERS[winner * -1]}`;
-        winBanner.style.backgroundColor = `${PLAYERS[winner]}`;
+        winBanner.style.color = `${PLAYERS[winner * -1].color}`;
+        winBanner.style.backgroundColor = `${PLAYERS[winner].color}`;
     }
 }
 
@@ -651,15 +668,20 @@ function checkForfeit() {
 
     board.forEach(function (colArr, colIdx) {
         colArr.forEach(function (content, rowIdx) {
+            /**
+            * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for tiles whose content === 0;
+            * note that you can only ever place a chip on an empty tile;
+            */
             if (content === 0) {
                 forfeit = !(checkAll(colIdx, rowIdx, forfeitKey));
+                // on each element of board, check to see if forfeit is FALSE; recall that by default, checkAll() assumes
+                // that isLegal is FALSE and seeks to find a SINGLE CASE that will assign it to TRUE; therefore, by 
+                // prefixing the return value of checkAll with a !, we can mutate that boolean for the purpose of forfeit,
+                // where we want precisely the opposite; we want assume that forfeit is TRUE and want to find a single
+                // case where it is FALSE
             }
         });
     });
     console.log(`checkForfeit returns: ${forfeit}`);
     return forfeit;
 }
-/**
- * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for those whose content === 0;
- * because you can only ever place a chip on an empty tile;
- */
