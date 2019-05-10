@@ -161,6 +161,7 @@ function checkUp(colIdx, rowIdx) {
         // this last else statement catches the case where the above tile is empty or out of bounds; if such is the case, simply break out 
         return;
     }
+    // TLDR; if a move is legal, then setGlobals
 }
 
 function checkDown(colIdx, rowIdx) {
@@ -453,9 +454,10 @@ function countChips() {
 function checkAll(colIdx, rowIdx, key) {
     let isLegal = false;
     // function scoped variable; set to true IF a SINGLE one of the nested if statements below is true
-    //by default, ASSUME that you all directions from the click point (whose col/row indices are passed in) 
-    //are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we can 
-    //change isLegal to be true. you only need to access the inside of ONE nested if statement to turn isLegal true.
+    // by default, ASSUME that you all directions from the click point (whose col/row indices are passed in) 
+    // are ILLEGAL moves; then, IF you manage to access the codeblock within the nested if statements, we can 
+    // change isLegal to be true. you only need to access the inside of ONE nested if statement to turn isLegal true
+    // (because we ONLY reassign isLegal inside the nested ifs)
 
     // first checks to make sure a move is legal (i.e. you are not clicking right next to a blank tile or
     // your own chip); IF that condition is met, then proceed to check through that direction; IF the move
@@ -570,7 +572,7 @@ function checkForfeit() {
              * so, while iterating through the ENTIRE board, we are looking SPECIFICALLY for tiles whose content === 0;
              * note that you can only ever place a chip on an empty tile;
              */
-            if ((board[colIdx][rowIdx] === 0) && !(checkAll(colIdx, rowIdx, forfeitKey))) forfeit = false;
+            if ((content === 0) && (!checkAll(colIdx, rowIdx, forfeitKey)===false)) forfeit = false;
             // on each element of board, check to see if forfeit is FALSE; recall that by default, checkAll() assumes
             // that isLegal is FALSE and seeks to find a SINGLE CASE that will assign it to TRUE; therefore, by 
             // prefixing the return value of checkAll with a !, we can mutate that boolean for the purpose of forfeit,
@@ -578,6 +580,5 @@ function checkForfeit() {
             // case where it is FALSE
         });
     });
-    console.log(`checkForfeit returns: ${forfeit}`);
     return forfeit;
 }
